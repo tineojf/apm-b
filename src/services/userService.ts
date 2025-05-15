@@ -25,13 +25,7 @@ export const registerUser = async (
     );
     const user = response.data;
     if (!user) {
-      return {
-        ok: false,
-        message: "User not found",
-        data: null,
-        dateTime: new Date().toLocaleDateString(),
-        detail: "User registration failed",
-      };
+      throw new Error("User registration failed: no user data returned");
     }
 
     const { error: profileError } = await supabase.from("profile").insert([
@@ -42,13 +36,7 @@ export const registerUser = async (
       },
     ]);
     if (profileError) {
-      return {
-        ok: false,
-        message: "Profile creation failed",
-        data: null,
-        dateTime: new Date().toISOString(),
-        detail: profileError.message,
-      };
+      throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
     const userDTO: UserDTO = {
@@ -72,7 +60,7 @@ export const registerUser = async (
       message: "Error signing up",
       data: null,
       dateTime: new Date().toISOString(),
-      detail: error?.response?.data?.msg || error.message || "Unknown error",
+      detail: error?.response?.data?.msg ?? error.message ?? "Unknown error",
     };
   }
 };
