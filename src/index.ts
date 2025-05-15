@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import prayerRoutes from "./routes/prayerRoutes";
+import userRoutes from "./routes/userRoutes";
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-app.use("/api/v1/demo", prayerRoutes);
+app.use("/api/v1/user", userRoutes);
 
 // Port
 const PORT = Number(process.env.PORT) || 5000;
