@@ -14,3 +14,14 @@ export const registerUser = async (
     res.status(400).json(response);
   }
 };
+
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+  const response = await userService.loginUser(email, password);
+
+  if (response.ok) {
+    res.status(200).json(response);
+  } else {
+    res.status(401).json(response);
+  }
+};
