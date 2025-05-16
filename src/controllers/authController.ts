@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import * as userService from "../services/userService";
+import * as authService from "../services/authService";
 
 export const registerUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { email, password, fullName } = req.body;
-  const response = await userService.registerUser(email, password, fullName);
+  const response = await authService.registerUser(email, password, fullName);
 
   if (response.ok) {
     res.status(201).json(response);
@@ -17,7 +17,21 @@ export const registerUser = async (
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
-  const response = await userService.loginUser(email, password);
+  const response = await authService.loginUser(email, password);
+
+  if (response.ok) {
+    res.status(200).json(response);
+  } else {
+    res.status(401).json(response);
+  }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { refreshToken } = req.body;
+  const response = await authService.refreshToken(refreshToken);
 
   if (response.ok) {
     res.status(200).json(response);
