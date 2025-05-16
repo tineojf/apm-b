@@ -12,6 +12,13 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message:
+      "Welcome to the API, please use /api/v1/user/register or /api/v1/user/login",
+  });
+});
+
 app.use("/api/v1/user", userRoutes);
 
 // Port
