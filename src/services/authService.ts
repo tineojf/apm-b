@@ -4,6 +4,9 @@ import { User, UserDTO } from "../models/userModel";
 import { GlobalResponse } from "../models/globalResponseModel";
 import dotenv from "dotenv";
 import { LoginDTO } from "../models/loginDTO";
+import { toLoginDTO } from "../mappers/authMapper";
+import { toRefreshTokenDTO } from "../mappers/tokenMapper";
+import { toUserDTO } from "../mappers/userMapper";
 
 dotenv.config();
 
@@ -42,13 +45,7 @@ export const registerUser = async (
     }
 
     // Create a user DTO
-    const userDTO: UserDTO = {
-      id: user.id,
-      email: user.email,
-      created_at: user.created_at,
-      full_name: fullName,
-      is_premium: false,
-    };
+    const userDTO = toUserDTO(user);
 
     return {
       ok: true,
@@ -85,19 +82,7 @@ export const loginUser = async (
       }
     );
     const user = response.data;
-
-    const loginDTO: LoginDTO = {
-      access_token: user.access_token,
-      refresh_token: user.refresh_token,
-      expires_in: user.expires_in,
-      expires_at: user.expires_at,
-      token_type: user.token_type,
-      user: {
-        id: user.user.id,
-        email: user.user.email,
-        email_confirmed_at: user.user.email_confirmed_at,
-      },
-    };
+    const loginDTO = toLoginDTO(user);
 
     return {
       ok: true,
@@ -110,6 +95,42 @@ export const loginUser = async (
     return {
       ok: false,
       message: "Error logging in",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error?.response?.data?.msg || error.message || "Unknown error",
+    };
+  }
+};
+
+export const refreshToken = async (
+  refreshToken: string
+): Promise<GlobalResponse> => {
+  try {
+    const response = await axios.post(
+      `${process.env.SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,
+      { refresh_token: refreshToken },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+          apikey: process.env.SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const token = response.data;
+    const refreshTokenDTO = toRefreshTokenDTO(token);
+
+    return {
+      ok: true,
+      message: "Token refreshed successfully",
+      data: refreshTokenDTO,
+      dateTime: new Date().toISOString(),
+      detail: "Token refresh successful",
+    };
+  } catch (error: any) {
+    return {
+      ok: false,
+      message: "Error refreshing token",
       data: null,
       dateTime: new Date().toISOString(),
       detail: error?.response?.data?.msg || error.message || "Unknown error",

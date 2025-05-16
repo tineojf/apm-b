@@ -25,3 +25,17 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(401).json(response);
   }
 };
+
+export const refreshToken = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { refreshToken } = req.body;
+  const response = await authService.refreshToken(refreshToken);
+
+  if (response.ok) {
+    res.status(200).json(response);
+  } else {
+    res.status(401).json(response);
+  }
+};

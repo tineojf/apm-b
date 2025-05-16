@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("auth", authRoutes);
+app.use("/auth", authRoutes);
 
 // Port
 const PORT = Number(process.env.PORT) || 5000;
