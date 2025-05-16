@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes";
+import chatRoutes from "./routes/chatRoutes";
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ app.use(cors());
 
 // Routes
 app.use("/api/v1/user", userRoutes);
+
+app.use("/api/v1/chat", chatRoutes);
 
 // Port
 const PORT = Number(process.env.PORT) || 5000;
