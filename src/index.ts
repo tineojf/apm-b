@@ -9,8 +9,8 @@ dotenv.config();
 const app: Application = express();
 
 // Middlewares
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 // Routes
 app.get("/", (req, res) => {
@@ -26,6 +26,6 @@ app.use("/api/v1/chat", chatRoutes);
 // Port
 const PORT = Number(process.env.PORT) || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
