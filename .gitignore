@@ -1,6 +1,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/node
 # Edit at https://www.toptal.com/developers/gitignore?templates=node
 
+# dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
 ### Node ###
 # Logs
 logs
