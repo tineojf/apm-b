@@ -109,13 +109,14 @@ export const createUserStreakService = async (
 };
 
 export const createStreakActivityService = async (
-  userId: string
+  userId: string,
+  completedAt?: string
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("streak_activity")
     .insert({
       user_id: userId,
-      completed_at: new Date().toISOString(),
+      completed_at: completedAt ?? new Date().toISOString(),
     })
     .select()
     .single();
@@ -136,4 +137,56 @@ export const createStreakActivityService = async (
     dateTime: new Date().toISOString(),
     detail: "Streak activity created successfully",
   };
+};
+
+export const extendStreakService = async ({
+  userId,
+  userStreak,
+  completedAt,
+}: {
+  userId: string;
+
+  userStreak: UserStreak;
+  completedAt?: string;
+}): Promise<GlobalResponse> => {
+  try {
+    const userActivity = await createStreakActivityService(userId, completedAt);
+
+    if (!userActivity.ok) throw new Error("User activity creation failed");
+
+    const newCurrentStreak = userStreak.current_streak + 1;
+
+    const { data: updatedStreak, error: updateError } = await supabase
+      .from("user_streaks")
+      .update({
+        current_streak: newCurrentStreak,
+        longest_streak: Math.max(userStreak.longest_streak, newCurrentStreak),
+        last_completed_date: completedAt ?? new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (updateError) throw new Error("User streak update failed");
+
+    return {
+      ok: true,
+      message: "User streak and activity updated successfully",
+      data: {
+        userStreak: updatedStreak,
+        streakActivity: userActivity.data,
+      },
+      dateTime: new Date().toISOString(),
+      detail: "User streak and activity updated successfully",
+    };
+  } catch (error: any) {
+    return {
+      ok: false,
+      message: "Failed to update user streak",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error?.message ?? "Unknown error",
+    };
+  }
 };

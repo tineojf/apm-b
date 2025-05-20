@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import {
+  extendStreakService,
   getUserStreakByUserId,
   getUserStreakInfoService,
   initializeStreak,
 } from "../services/streakService";
+import dayjs from "dayjs";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);
@@ -12,7 +14,6 @@ export const getStreakInfoController = async (req: Request, res: Response) => {
 };
 
 export const updateStreakController = async (req: Request, res: Response) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
   const user = req.user!;
 
   const userStreak = await getUserStreakByUserId(user.id);
@@ -24,14 +25,10 @@ export const updateStreakController = async (req: Request, res: Response) => {
     return;
   }
 
-  // const updateUserStreak = await updateUserStreakService({
-  //   userId: user.id,
-  //   token: token!,
-  //   userStreak: userStreak,
-  // });
+  const resp = await extendStreakService({
+    userId: user.id,
+    userStreak: userStreak,
+  });
 
-  // res.status(updateUserStreak.ok ? 200 : 409).json(updateUserStreak);
-
-  res.status(500).json({ ok: false });
-  return;
+  res.status(resp.ok ? 200 : 409).json(resp);
 };
