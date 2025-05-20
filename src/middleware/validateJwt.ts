@@ -25,8 +25,6 @@ export const authenticate = async (
     return;
   }
 
-  console.log("user->", user);
-
   req["user"] = user;
   next();
 };
