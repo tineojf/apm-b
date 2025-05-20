@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes";
 import chatRoutes from "./routes/chatRoutes";
+import streakRoutes from "./routes/streakRoutes";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/streak", streakRoutes);
 
 // Port
 const PORT = Number(process.env.PORT) || 5000;
