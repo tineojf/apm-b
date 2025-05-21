@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   extendStreakService,
+  getStreakActivityService,
   getUserStreakByUserId,
   getUserStreakInfoService,
   initializeStreak,
@@ -31,4 +32,13 @@ export const updateStreakController = async (req: Request, res: Response) => {
   });
 
   res.status(resp.ok ? 200 : 409).json(resp);
+};
+
+export const getStreakActivityController = async (
+  req: Request,
+  res: Response
+) => {
+  const streakActivity = await getStreakActivityService(req.user!.id);
+
+  res.status(streakActivity.ok ? 200 : 409).json(streakActivity);
 };

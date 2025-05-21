@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getStreakActivityController,
   getStreakInfoController,
   updateStreakController,
 } from "../controllers/streakController";
@@ -12,5 +13,7 @@ streakRoutes.use(authenticate);
 streakRoutes.get("/info", getStreakInfoController);
 
 streakRoutes.post("/update", updateStreakController);
+
+streakRoutes.get("/activity", getStreakActivityController);
 
 export default streakRoutes;
