@@ -5,6 +5,7 @@ import {
   getUserStreakByUserId,
   getUserStreakInfoService,
   initializeStreak,
+  getHasPrayedTodayService,
 } from "../services/streakService";
 import dayjs from "dayjs";
 
@@ -41,4 +42,13 @@ export const getStreakActivityController = async (
   const streakActivity = await getStreakActivityService(req.user!.id);
 
   res.status(streakActivity.ok ? 200 : 409).json(streakActivity);
+};
+
+export const getHasPrayedTodayController = async (
+  req: Request,
+  res: Response
+) => {
+  const hasPrayedToday = await getHasPrayedTodayService(req.user!.id);
+
+  res.status(hasPrayedToday.ok ? 200 : 409).json(hasPrayedToday);
 };

@@ -217,3 +217,31 @@ export const getStreakActivityService = async (
     detail: "Streak activity retrieved successfully",
   };
 };
+
+export const getHasPrayedTodayService = async (
+  userId: string
+): Promise<GlobalResponse> => {
+  const { data, error } = await supabase
+    .from("streak_activity")
+    .select("completed_at")
+    .eq("user_id", userId)
+    .eq("completed_at", dayjs().format("YYYY-MM-DD"))
+    .single();
+
+  if (error)
+    return {
+      ok: false,
+      message: "Streak activity retrieval failed",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error?.message ?? "Unknown error",
+    };
+
+  return {
+    ok: true,
+    message: "Streak activity retrieved successfully",
+    data: data as StreakActivity,
+    dateTime: new Date().toISOString(),
+    detail: "Streak activity retrieved successfully",
+  };
+};
