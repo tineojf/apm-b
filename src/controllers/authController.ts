@@ -50,9 +50,6 @@ export const validateTokenController = async (req: Request, res: Response) => {
 
   const { data, error } = await supabase.auth.getUser(token);
 
-  console.log("data", data);
-  console.log("error", error);
-
   if (error || !data?.user) {
     res.status(200).json({ valid: false, message: "token invalid or expired" });
     return;
