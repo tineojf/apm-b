@@ -66,7 +66,7 @@ export const initializeStreak = async (
   } catch (error: any) {
     return {
       ok: false,
-      message: "User streak creation failed",
+      message: "initialize streak failed",
       data: null,
       dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
@@ -145,7 +145,6 @@ export const extendStreakService = async ({
   completedAt,
 }: {
   userId: string;
-
   userStreak: UserStreak;
   completedAt?: string;
 }): Promise<GlobalResponse> => {
@@ -231,7 +230,7 @@ export const getHasPrayedTodayService = async (
   if (error)
     return {
       ok: false,
-      message: "Streak activity retrieval failed",
+      message: "Not found user's prayed today",
       data: null,
       dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
@@ -239,7 +238,7 @@ export const getHasPrayedTodayService = async (
 
   return {
     ok: true,
-    message: "Streak activity retrieved successfully",
+    message: "Found user's prayed today",
     data: data as StreakActivity,
     dateTime: new Date().toISOString(),
     detail: "Streak activity retrieved successfully",

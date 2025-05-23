@@ -27,6 +27,14 @@ export const updateStreakController = async (req: Request, res: Response) => {
     return;
   }
 
+  // If user has prayed today, return the response
+  const prayedToday = await getHasPrayedTodayService(user.id);
+
+  if (prayedToday.ok) {
+    res.status(200).json(prayedToday);
+    return;
+  }
+
   const resp = await extendStreakService({
     userId: user.id,
     userStreak: userStreak,
