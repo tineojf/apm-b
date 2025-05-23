@@ -151,3 +151,4 @@ dist
 demo/
 
 package-lock.json
+.vercel
