@@ -25,8 +25,4 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/streak", streakRoutes);
 
-const PORT = Number(process.env.PORT) || 5000;
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export default app;
