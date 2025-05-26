@@ -25,4 +25,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/streak", streakRoutes);
 
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port http://localhost:${process.env.PORT}`);
+});
+
 export default app;
