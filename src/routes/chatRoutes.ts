@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { streamChat } from "../controllers/chatController";
 import { relationshipChat } from "../controllers/relationshipController";
+import { lifeChallengesChat } from "../controllers/lifeChallengesController";
 import { validate } from "../middleware/validate";
 import { streamingSchema } from "../validators/streamingValidator";
 import { relationshipSchema } from "../validators/relationshipValidator";
@@ -15,6 +16,11 @@ chatRoutes.post(
   "/relationship",
   validate(relationshipSchema),
   relationshipChat
+);
+chatRoutes.post(
+  "/life-challenges",
+  validate(relationshipSchema),
+  lifeChallengesChat
 );
 
 export default chatRoutes;
