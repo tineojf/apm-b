@@ -11,9 +11,6 @@ export const getProfileService = async (
     .eq("id", userId)
     .single();
 
-  console.log(data);
-  console.log(error);
-
   if (error)
     return {
       ok: false,
