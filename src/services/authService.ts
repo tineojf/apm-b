@@ -1,8 +1,8 @@
 import axios from "axios";
-import { supabase } from "../utils/supabaseClient";
-import { User } from "../models/userModel";
-import { GlobalResponse } from "../models/globalResponseModel";
 import dotenv from "dotenv";
+import { supabase } from "../utils/supabaseClient";
+import { GlobalResponse } from "../models/globalResponseModel";
+import { fetchProfileByUserId } from "./profileService";
 import { toLoginDTO } from "../mappers/authMapper";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
 import { toUserDTO } from "../mappers/userMapper";
@@ -15,23 +15,19 @@ export const registerUser = async (
   fullName: string
 ): Promise<GlobalResponse> => {
   try {
-    const response = await axios.post<User>(
-      `${process.env.SUPABASE_URL}/auth/v1/admin/users`,
-      { email, password },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-          apikey: process.env.SUPABASE_ANON_KEY,
-          "Content-Type": "application/json",
-        },
-      }
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
+      { email, password }
     );
-    const user = response.data;
-    if (!user) {
-      throw new Error("User registration failed: no user data returned");
+
+    if (signUpError) {
+      throw new Error(signUpError.message);
+    }
+    if (!signUpData.user) {
+      throw new Error("User registration failed: no user returned");
     }
 
-    // Insert user into the profile table
+    const user = signUpData.user;
+
     const { error: profileError } = await supabase.from("profile").insert([
       {
         id: user.id,
@@ -39,11 +35,11 @@ export const registerUser = async (
         is_premium: false,
       },
     ]);
+
     if (profileError) {
       throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
-    // Create a user DTO
     const userDTO = toUserDTO(user, fullName);
 
     return {
@@ -59,7 +55,7 @@ export const registerUser = async (
       message: "Error signing up",
       data: null,
       dateTime: new Date().toISOString(),
-      detail: error?.response?.data?.msg ?? error.message ?? "Unknown error",
+      detail: error?.message ?? "Unknown error",
     };
   }
 };
@@ -73,30 +69,42 @@ export const loginUser = async (
     password,
   });
 
-  console.log("User: ", data?.session);
-
-  const dataResponse = await supabase
-    .from("profile")
-    .select("full_name, is_premium, created_at")
-    .eq("id", data!.user!.id)
-    .single();
-
-  const { data: dataProfile, error: profileError } = dataResponse;
-
-  if (error || profileError) {
-    const detail = error?.message || profileError?.message || "Unknown error";
+  if (error) {
+    console.error("Login error:", error.message);
     return {
       ok: false,
       message: "Error logging in",
       data: null,
       dateTime: new Date().toISOString(),
-      detail,
+      detail: error.message,
     };
   }
 
-  const loginDTO = toLoginDTO(data, dataProfile);
+  if (!data || !data.user) {
+    return {
+      ok: false,
+      message: "Login failed, no user data returned",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: "User or session missing after login",
+    };
+  }
 
-  console.log("Login response:-------", data);
+  const { profile, error: profileError } = await fetchProfileByUserId(
+    data.user.id
+  );
+
+  if (profileError) {
+    return {
+      ok: false,
+      message: "Error fetching profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: profileError.message,
+    };
+  }
+
+  const loginDTO = toLoginDTO(data, profile);
 
   return {
     ok: true,

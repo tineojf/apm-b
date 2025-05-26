@@ -2,14 +2,25 @@ import { GlobalResponse } from "../models/globalResponseModel";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 
-export const getProfileService = async (
+export const fetchProfileByUserId = async (
   userId: string
-): Promise<GlobalResponse> => {
+): Promise<{ profile: Profile | null; error: Error | null }> => {
   const { data, error } = await supabase
     .from("profile")
     .select("full_name, is_premium, created_at")
     .eq("id", userId)
     .single();
+
+  if (error) {
+    return { profile: null, error };
+  }
+  return { profile: data as Profile, error: null };
+};
+
+export const getProfileService = async (
+  userId: string
+): Promise<GlobalResponse> => {
+  const { profile, error } = await fetchProfileByUserId(userId);
 
   if (error)
     return {
@@ -20,12 +31,10 @@ export const getProfileService = async (
       detail: error.message,
     };
 
-  const dataProfile = data as Profile;
-
   return {
     ok: true,
     message: "Profile fetched successfully",
-    data: dataProfile,
+    data: profile,
     dateTime: new Date().toISOString(),
     detail: "Profile fetched successfully",
   };
