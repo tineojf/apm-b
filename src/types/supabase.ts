@@ -16,3 +16,10 @@ export interface StreakActivity {
   user_id: string;
   completed_at: string;
 }
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  is_premium: boolean;
+  created_at?: string;
+}
