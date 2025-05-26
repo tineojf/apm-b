@@ -2,6 +2,8 @@ import { Router } from "express";
 import { streamChat } from "../controllers/chatController";
 import { relationshipChat } from "../controllers/relationshipController";
 import { lifeChallengesChat } from "../controllers/lifeChallengesController";
+import { forgivenessChat } from "../controllers/forgivenessController";
+import { prayerChat } from "../controllers/prayerController";
 import { validate } from "../middleware/validate";
 import { streamingSchema } from "../validators/streamingValidator";
 import { relationshipSchema } from "../validators/relationshipValidator";
@@ -22,5 +24,7 @@ chatRoutes.post(
   validate(relationshipSchema),
   lifeChallengesChat
 );
+chatRoutes.post("/forgiveness", validate(relationshipSchema), forgivenessChat);
+chatRoutes.post("/prayer", validate(relationshipSchema), prayerChat);
 
 export default chatRoutes;
