@@ -1,9 +1,8 @@
 import axios from "axios";
 import { supabase } from "../utils/supabaseClient";
-import { User, UserDTO } from "../models/userModel";
+import { User } from "../models/userModel";
 import { GlobalResponse } from "../models/globalResponseModel";
 import dotenv from "dotenv";
-import { LoginDTO } from "../models/loginDTO";
 import { toLoginDTO } from "../mappers/authMapper";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
 import { toUserDTO } from "../mappers/userMapper";
@@ -45,7 +44,7 @@ export const registerUser = async (
     }
 
     // Create a user DTO
-    const userDTO = toUserDTO(user);
+    const userDTO = toUserDTO(user, fullName);
 
     return {
       ok: true,
@@ -69,37 +68,43 @@ export const loginUser = async (
   email: string,
   password: string
 ): Promise<GlobalResponse> => {
-  try {
-    const response = await axios.post<LoginDTO>(
-      `${process.env.SUPABASE_URL}/auth/v1/token?grant_type=password`,
-      { email, password },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-          apikey: process.env.SUPABASE_ANON_KEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const user = response.data;
-    const loginDTO = toLoginDTO(user);
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    return {
-      ok: true,
-      message: "User logged in successfully",
-      data: loginDTO,
-      dateTime: new Date().toISOString(),
-      detail: "User login successful",
-    };
-  } catch (error: any) {
+  console.log("User: ", data?.session);
+
+  const dataResponse = await supabase
+    .from("profile")
+    .select("full_name, is_premium, created_at")
+    .eq("id", data!.user!.id)
+    .single();
+
+  const { data: dataProfile, error: profileError } = dataResponse;
+
+  if (error || profileError) {
+    const detail = error?.message || profileError?.message || "Unknown error";
     return {
       ok: false,
       message: "Error logging in",
       data: null,
       dateTime: new Date().toISOString(),
-      detail: error?.response?.data?.msg || error.message || "Unknown error",
+      detail,
     };
   }
+
+  const loginDTO = toLoginDTO(data, dataProfile);
+
+  console.log("Login response:-------", data);
+
+  return {
+    ok: true,
+    message: "User logged in successfully",
+    data: loginDTO,
+    dateTime: new Date().toISOString(),
+    detail: "User login successful",
+  };
 };
 
 export const refreshToken = async (
