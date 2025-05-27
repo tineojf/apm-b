@@ -20,12 +20,14 @@ export const prayerController = async (req: Request, res: Response) => {
 
   if (!answer) {
     res.status(400).json({ error: "Answer is required" });
+    return;
   }
 
   if (!allowedValues.includes(answer)) {
     res
       .status(400)
       .json({ error: "Answer must be 'bad', 'good', or 'neutral'" });
+    return;
   }
 
   try {
