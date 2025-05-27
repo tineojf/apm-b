@@ -16,8 +16,16 @@ export const citationController = async (_req: Request, res: Response) => {
 export const prayerController = async (req: Request, res: Response) => {
   const { answer } = req.body;
 
+  const allowedValues = ["bad", "good", "neutral"];
+
   if (!answer) {
     res.status(400).json({ error: "Answer is required" });
+  }
+
+  if (!allowedValues.includes(answer)) {
+    res
+      .status(400)
+      .json({ error: "Answer must be 'bad', 'good', or 'neutral'" });
   }
 
   try {
