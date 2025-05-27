@@ -29,6 +29,10 @@ app.use("/api/v1/streak", streakRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/openai", openaiRoutes);
 
+// Vercel
+// export default app;
+
+// Local server
 const PORT = Number(process.env.PORT) || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
