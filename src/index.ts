@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import streakRoutes from "./routes/streakRoutes";
 import profileRoutes from "./routes/profileRoutes";
+import openaiRoutes from "./routes/openaiRoutes";
 
 dotenv.config();
 
@@ -26,7 +27,12 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/streak", streakRoutes);
 app.use("/api/v1/profile", profileRoutes);
+app.use("/api/v1/openai", openaiRoutes);
 
+// Vercel
+// export default app;
+
+// Local server
 const PORT = Number(process.env.PORT) || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
