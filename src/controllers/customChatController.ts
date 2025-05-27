@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
-import type { RelationshipDTO } from "../validators/relationshipValidator";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+
+import { streamChat } from "../services/chatService";
+
 import { RELATIONSHIP_SYSTEM_PROMPT } from "../prompts/relationshipPrompt";
 import { LIFE_CHALLENGES_SYSTEM_PROMPT } from "../prompts/lifeChallengesPrompt";
 import { FORGIVENESS_SYSTEM_PROMPT } from "../prompts/forgivenessPrompt";
 import { PRAYER_SYSTEM_PROMPT } from "../prompts/prayerPrompt";
-import { streamChat } from "../services/chatService";
+
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { StreamingDTO } from "../validators/streamingValidator";
 
 export const relationshipChat = async (req: Request, res: Response) => {
