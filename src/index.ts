@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import streakRoutes from "./routes/streakRoutes";
+import profileRoutes from "./routes/profileRoutes";
 
 dotenv.config();
 
@@ -24,5 +25,10 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/streak", streakRoutes);
+app.use("/api/v1/profile", profileRoutes);
 
-export default app;
+const PORT = Number(process.env.PORT) || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
