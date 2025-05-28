@@ -19,7 +19,7 @@ export const getChapter = async (req: Request, res: Response) => {
       return;
     }
 
-    res.json(chapter);
+    res.status(200).json(chapter);
   } catch (error) {
     console.log("Error fetching find chapter by book", error);
     res.status(500).json({ message: "Error fetching chapter" });
@@ -39,7 +39,7 @@ export const getAllChaptersByBook = async (req: Request, res: Response) => {
 
     const chapters = await fetchChapters(book_id);
 
-    res.json(chapters);
+    res.status(200).json(chapters);
   } catch (error) {
     console.log("Error fetching chapters by book", error);
     res.status(500).json({ message: "Error fetching chapters by book" });
