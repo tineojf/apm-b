@@ -7,12 +7,11 @@ import {
   initializeStreak,
   getHasPrayedTodayService,
 } from "../services/streakService";
-import dayjs from "dayjs";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);
 
-  res.status(streakInfo.ok ? 200 : 409).json(streakInfo);
+  res.status(streakInfo.ok ? 200 : 404).json(streakInfo);
 };
 
 export const updateStreakController = async (req: Request, res: Response) => {
