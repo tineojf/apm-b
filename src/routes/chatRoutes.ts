@@ -5,6 +5,7 @@ import {
   lifeChallengesChat,
   forgivenessChat,
   prayerChat,
+  bibleChat,
 } from "../controllers/customChatController";
 import { validate } from "../middleware/validate";
 import { streamingSchema } from "../validators/streamingValidator";
@@ -24,5 +25,6 @@ chatRoutes.post("/relationship", relationshipChat);
 chatRoutes.post("/life-challenges", lifeChallengesChat);
 chatRoutes.post("/forgiveness", forgivenessChat);
 chatRoutes.post("/prayer", prayerChat);
+chatRoutes.post("/bible", bibleChat);
 
 export default chatRoutes;
