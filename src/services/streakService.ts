@@ -36,7 +36,11 @@ export const getUserStreakByUserId = async (
     .eq("user_id", userId)
     .single();
 
-  if (error) return null;
+  if (error) {
+    console.log("error in getUserStreakByUserId", error);
+    console.log("data in getUserStreakByUserId", data);
+    return null;
+  }
 
   return data as UserStreak;
 };
