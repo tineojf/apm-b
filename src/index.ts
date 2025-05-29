@@ -31,10 +31,6 @@ app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/openai", openaiRoutes);
 app.use("/api/v1/bible", bibleRoutes);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port http://localhost:${process.env.PORT}`);
-});
-
 // Vercel
 export default app;
 
@@ -42,5 +38,5 @@ export default app;
 // const PORT = Number(process.env.PORT) || 5000;
 
 // app.listen(PORT, "0.0.0.0", () => {
-// console.log(`Server running on port ${PORT}`);
+// console.log(`Server running on port http://localhost:${process.env.PORT}`);
 // });
