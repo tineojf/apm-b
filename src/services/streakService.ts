@@ -2,157 +2,139 @@ import dayjs from "../config/dayjs";
 import { supabase } from "../utils/supabaseClient";
 import { StreakActivity, UserStreak } from "../types/supabase";
 import { GlobalResponse } from "../models/globalResponseModel";
+import { createResponse } from "../utils/globalResponse";
 
-export const getUserStreakInfoService = async (
-  userId: string
-): Promise<GlobalResponse> => {
+const updateUserStreak = async (
+  userId: string,
+  updateData: Partial<UserStreak>
+): Promise<UserStreak> => {
+  const { data, error } = await supabase
+    .from("user_streaks")
+    .update({
+      ...updateData,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as UserStreak;
+};
+
+const resetStreak = async (userId: string): Promise<UserStreak> => {
+  return updateUserStreak(userId, {
+    current_streak: 0,
+    remaining_lives: 3,
+    last_lives_reset: new Date().toISOString(),
+  });
+};
+
+const deductLives = async (
+  userId: string,
+  currentLives: number,
+  daysToDeduct: number
+): Promise<UserStreak> => {
+  const newRemainingLives = currentLives - daysToDeduct;
+
+  if (newRemainingLives <= 0) {
+    return resetStreak(userId);
+  }
+
+  return updateUserStreak(userId, {
+    remaining_lives: newRemainingLives,
+  });
+};
+
+export const getUserStreakInfoService = async (userId: string) => {
   try {
     const userStreak = await getUserStreakByUserId(userId);
 
     if (!userStreak) {
-      return {
-        ok: false,
+      return createResponse({
         message: "User streak not found",
         data: null,
-        dateTime: new Date().toISOString(),
         detail: "User streak not found",
-      };
+        statusCode: 404,
+      });
     }
 
-    // Verificar si ya se realizó una actualización hoy
     const lastUpdate = dayjs(userStreak.updated_at);
     const today = dayjs();
 
     if (lastUpdate.isSame(today, "day")) {
       console.log("User streak found - Already validated today");
-      return {
-        ok: true,
-        message: "User streak found",
+      return createResponse({
+        message: "User streak found - Already validated today",
         data: userStreak,
-        dateTime: new Date().toISOString(),
         detail: "User streak found - Already validated today",
-      };
+      });
     }
 
     const lastCompletedDate = dayjs(userStreak.last_completed_date);
     const yesterday = today.subtract(1, "day").startOf("day");
     const daysSinceLastCompletion = today.diff(lastCompletedDate, "day");
 
-    // Si la última actualización fue ayer, retornar la información actual
     if (lastCompletedDate.isSame(yesterday, "day")) {
       console.log("User streak found - Last completion was yesterday");
-      return {
-        ok: true,
-        message: "User streak found",
+      return createResponse({
+        message: "User streak found - Last completion was yesterday",
         data: userStreak,
-        dateTime: new Date().toISOString(),
         detail: "User streak found - Last completion was yesterday",
-      };
+      });
     }
 
-    // Si han pasado más de 3 días, reiniciar la racha
     if (daysSinceLastCompletion > 3) {
-      const { data: updatedStreak, error } = await supabase
-        .from("user_streaks")
-        .update({
-          current_streak: 0,
-          remaining_lives: 3,
-          last_lives_reset: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
+      const updatedStreak = await resetStreak(userId);
       console.log("User streak reset due to inactivity", updatedStreak);
-
-      return {
-        ok: true,
+      return createResponse({
         message: "User streak reset due to inactivity",
         data: updatedStreak,
-        dateTime: new Date().toISOString(),
-        detail: "Streak reset - More than 3 days of inactivity",
-      };
+        detail: "User streak reset due to inactivity",
+      });
     }
 
-    // Si han pasado menos de 3 días, restar las vidas según los días de inactividad
     if (daysSinceLastCompletion <= 3 && daysSinceLastCompletion > 1) {
-      const daysToDeduct = daysSinceLastCompletion - 1; // Restamos 1 porque el día actual no cuenta
-      const newRemainingLives = userStreak.remaining_lives - daysToDeduct;
+      const daysToDeduct = daysSinceLastCompletion - 1;
+      const updatedStreak = await deductLives(
+        userId,
+        userStreak.remaining_lives,
+        daysToDeduct
+      );
 
-      // Si se quedó sin vidas, reiniciar la racha
-      if (newRemainingLives <= 0) {
-        const { data: updatedStreak, error } = await supabase
-          .from("user_streaks")
-          .update({
-            current_streak: 0,
-            remaining_lives: 3,
-            last_lives_reset: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_id", userId)
-          .select()
-          .single();
+      const message =
+        updatedStreak.remaining_lives === 3
+          ? "User streak reset due to no remaining lives"
+          : "User streak updated - Lives deducted";
 
-        console.log(
-          "User streak reset due to no remaining lives",
-          updatedStreak
-        );
+      const detail = `Streak ${
+        updatedStreak.remaining_lives === 3 ? "reset" : "maintained"
+      } - Lost ${daysToDeduct} lives due to ${daysSinceLastCompletion} days of inactivity. ${
+        updatedStreak.remaining_lives
+      } lives remaining`;
 
-        if (error) throw error;
+      console.log(message, updatedStreak);
 
-        return {
-          ok: true,
-          message: "User streak reset due to no remaining lives",
-          data: updatedStreak,
-          dateTime: new Date().toISOString(),
-          detail: `Streak reset - Lost ${daysToDeduct} lives due to ${daysSinceLastCompletion} days of inactivity`,
-        };
-      }
-
-      // Si aún tiene vidas, actualizar el contador
-      const { data: updatedStreak, error } = await supabase
-        .from("user_streaks")
-        .update({
-          remaining_lives: newRemainingLives,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      console.log("User streak updated - Lives deducted", updatedStreak);
-
-      return {
-        ok: true,
-        message: "User streak updated - Lives deducted",
+      return createResponse({
+        message,
         data: updatedStreak,
-        dateTime: new Date().toISOString(),
-        detail: `Streak maintained - Lost ${daysToDeduct} lives due to ${daysSinceLastCompletion} days of inactivity. ${newRemainingLives} lives remaining`,
-      };
+        detail,
+      });
     }
 
     console.log("User streak found - No changes needed", userStreak);
-    // Si no se cumplió ninguna condición anterior, retornar la información actual
-    return {
-      ok: true,
-      message: "User streak found",
+    return createResponse({
+      message: "User streak found - No changes needed",
       data: userStreak,
-      dateTime: new Date().toISOString(),
       detail: "User streak found - No changes needed",
-    };
+    });
   } catch (error: any) {
-    return {
-      ok: false,
+    return createResponse({
       message: "Error processing user streak",
       data: null,
-      dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
-    };
+      statusCode: 500,
+    });
   }
 };
 

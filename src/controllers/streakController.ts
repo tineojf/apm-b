@@ -11,7 +11,7 @@ import {
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);
 
-  res.status(streakInfo.ok ? 200 : 404).json(streakInfo);
+  res.status(streakInfo.statusCode).json(streakInfo);
 };
 
 export const updateStreakController = async (req: Request, res: Response) => {
