@@ -29,7 +29,7 @@ export const updateStreakController = async (req: Request, res: Response) => {
   }
 
   // If user has prayed today, return the response
-  const prayedToday = await getHasPrayedTodayService(user.id);
+  const prayedToday = await getHasPrayedTodayService(user.id, completedAt);
 
   if (prayedToday.ok) {
     res.status(200).json(prayedToday);
@@ -58,7 +58,12 @@ export const getHasPrayedTodayController = async (
   req: Request,
   res: Response
 ) => {
-  const hasPrayedToday = await getHasPrayedTodayService(req.user!.id);
+  const { completedAt } = req.body as StreakActivityDTO;
 
-  res.status(hasPrayedToday.ok ? 200 : 409).json(hasPrayedToday);
+  const hasPrayedToday = await getHasPrayedTodayService(
+    req.user!.id,
+    completedAt
+  );
+
+  res.status(hasPrayedToday.statusCode).json(hasPrayedToday);
 };
