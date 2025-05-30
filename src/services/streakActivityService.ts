@@ -4,13 +4,13 @@ import { supabase } from "../utils/supabaseClient";
 
 export const createStreakActivityService = async (
   userId: string,
-  completedAt?: string
+  completedAt: string
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("streak_activity")
     .insert({
       user_id: userId,
-      completed_at: completedAt ?? new Date().toISOString(),
+      completed_at: completedAt,
     })
     .select()
     .single();
