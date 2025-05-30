@@ -3,17 +3,18 @@ import { UserStreak } from "../types/supabase";
 import { GlobalResponse } from "../models/globalResponseModel";
 
 export const createUserStreakService = async (
-  userId: string
+  userId: string,
+  createdDate: string
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("user_streaks")
     .insert({
       user_id: userId,
-      last_completed_date: new Date().toISOString(),
+      last_completed_date: createdDate,
       current_streak: 1,
       longest_streak: 1,
       remaining_lives: 3,
-      last_lives_reset: new Date().toISOString(),
+      last_lives_reset: createdDate,
     })
     .select()
     .single();
