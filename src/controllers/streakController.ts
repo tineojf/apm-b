@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import {
   extendStreakService,
-  getStreakActivityService,
-  getUserStreakByUserId,
   getUserStreakInfoService,
   initializeStreak,
   getHasPrayedTodayService,
 } from "../services/streakService";
+import { getUserStreakByUserId } from "../services/userStreakService";
+import { getStreakActivityService } from "../services/streakActivityService";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);

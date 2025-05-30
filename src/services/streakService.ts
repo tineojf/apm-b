@@ -1,26 +1,14 @@
 import dayjs from "../config/dayjs";
 import { supabase } from "../utils/supabaseClient";
+import {
+  createUserStreakService,
+  getUserStreakByUserId,
+  updateUserStreak,
+} from "./userStreakService";
 import { StreakActivity, UserStreak } from "../types/supabase";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { createResponse } from "../utils/globalResponse";
-
-const updateUserStreak = async (
-  userId: string,
-  updateData: Partial<UserStreak>
-): Promise<UserStreak> => {
-  const { data, error } = await supabase
-    .from("user_streaks")
-    .update({
-      ...updateData,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data as UserStreak;
-};
+import { createStreakActivityService } from "./streakActivityService";
 
 const resetStreak = async (userId: string): Promise<UserStreak> => {
   return updateUserStreak(userId, {
@@ -138,24 +126,6 @@ export const getUserStreakInfoService = async (userId: string) => {
   }
 };
 
-export const getUserStreakByUserId = async (
-  userId: string
-): Promise<UserStreak | null> => {
-  const { data, error } = await supabase
-    .from("user_streaks")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
-
-  if (error) {
-    console.log("error in getUserStreakByUserId", error);
-    console.log("data in getUserStreakByUserId", data);
-    return null;
-  }
-
-  return data as UserStreak;
-};
-
 export const initializeStreak = async (
   userId: string
 ): Promise<GlobalResponse> => {
@@ -187,71 +157,6 @@ export const initializeStreak = async (
       detail: error?.message ?? "Unknown error",
     };
   }
-};
-
-export const createUserStreakService = async (
-  userId: string
-): Promise<GlobalResponse> => {
-  const { data, error } = await supabase
-    .from("user_streaks")
-    .insert({
-      user_id: userId,
-      last_completed_date: new Date().toISOString(),
-      current_streak: 1,
-      longest_streak: 1,
-      remaining_lives: 3,
-      last_lives_reset: new Date().toISOString(),
-    })
-    .select()
-    .single();
-
-  if (error)
-    return {
-      ok: false,
-      message: "User streak creation failed",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error?.message ?? "Unknown error",
-    };
-
-  return {
-    ok: true,
-    message: "User streak created successfully",
-    data: data as UserStreak,
-    dateTime: new Date().toISOString(),
-    detail: "User streak created successfully",
-  };
-};
-
-export const createStreakActivityService = async (
-  userId: string,
-  completedAt?: string
-): Promise<GlobalResponse> => {
-  const { data, error } = await supabase
-    .from("streak_activity")
-    .insert({
-      user_id: userId,
-      completed_at: completedAt ?? new Date().toISOString(),
-    })
-    .select()
-    .single();
-
-  if (error)
-    return {
-      ok: false,
-      message: "Streak activity creation failed",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error?.message ?? "Unknown error",
-    };
-
-  return {
-    ok: true,
-    message: "Streak activity created successfully",
-    data: data as StreakActivity,
-    dateTime: new Date().toISOString(),
-    detail: "Streak activity created successfully",
-  };
 };
 
 export const extendStreakService = async ({
@@ -305,44 +210,22 @@ export const extendStreakService = async ({
   }
 };
 
-export const getStreakActivityService = async (
+export const getHasPrayedTodayService = async (
   userId: string
 ): Promise<GlobalResponse> => {
+  const today = dayjs().format("YYYY-MM-DD HH:mm");
+  const todayUTC = dayjs(new Date().toISOString()).format("YYYY-MM-DD HH:mm");
+
+  console.log("today", today);
+  console.log("todayUTC", todayUTC);
   const { data, error } = await supabase
     .from("streak_activity")
     .select("*")
     .eq("user_id", userId)
-    .order("completed_at", { ascending: false });
+    .eq("completed_at", today);
 
-  if (error)
-    return {
-      ok: false,
-      message: "Streak activity retrieval failed",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error?.message ?? "Unknown error",
-    };
-
-  return {
-    ok: true,
-    message: "Streak activity retrieved successfully",
-    data: data as StreakActivity[],
-    dateTime: new Date().toISOString(),
-    detail: "Streak activity retrieved successfully",
-  };
-};
-
-export const getHasPrayedTodayService = async (
-  userId: string
-): Promise<GlobalResponse> => {
-  const { data, error } = await supabase
-    .from("streak_activity")
-    .select("completed_at")
-    .eq("user_id", userId)
-    .eq("completed_at", dayjs().format("YYYY-MM-DD"))
-    .single();
-
-  if (error)
+  if (error) {
+    console.log("error in getHasPrayedTodayService", error);
     return {
       ok: false,
       message: "Not found user's prayed today",
@@ -350,11 +233,13 @@ export const getHasPrayedTodayService = async (
       dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
     };
+  }
 
+  console.log("data", dayjs(data[0].created_at).format("YYYY-MM-DD HH:mm"));
   return {
     ok: true,
     message: "Found user's prayed today",
-    data: data as StreakActivity,
+    data: data as StreakActivity[],
     dateTime: new Date().toISOString(),
     detail: "Streak activity retrieved successfully",
   };
