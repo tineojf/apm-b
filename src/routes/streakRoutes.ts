@@ -15,9 +15,17 @@ streakRoutes.use(authenticate);
 
 streakRoutes.get("/info", getStreakInfoController);
 
-streakRoutes.post("/update", validate(streakActivitySchema), updateStreakController);
+streakRoutes.post(
+  "/update",
+  validate(streakActivitySchema),
+  updateStreakController
+);
 
-streakRoutes.get("/has-prayed-today", getHasPrayedTodayController);
+streakRoutes.get(
+  "/has-prayed-today",
+  validate(streakActivitySchema),
+  getHasPrayedTodayController
+);
 
 streakRoutes.get("/activity", getStreakActivityController);
 
