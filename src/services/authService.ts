@@ -5,7 +5,6 @@ import { GlobalResponse } from "../models/globalResponseModel";
 import { fetchProfileByUserId } from "./profileService";
 import { toLoginDTO } from "../mappers/authMapper";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
-import { toUserDTO } from "../mappers/userMapper";
 
 dotenv.config();
 
@@ -18,6 +17,7 @@ export const registerUser = async (
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
       { email, password }
     );
+    console.log("SignUp Data:", signUpData);
 
     if (signUpError) {
       throw new Error(signUpError.message);
@@ -40,12 +40,12 @@ export const registerUser = async (
       throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
-    const userDTO = toUserDTO(user, fullName);
+    const loginDTO = toLoginDTO(signUpData, signUpData.user);
 
     return {
       ok: true,
       message: "User registered successfully",
-      data: userDTO,
+      data: loginDTO,
       dateTime: new Date().toISOString(),
       detail: "User registration successful",
     };
