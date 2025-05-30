@@ -127,14 +127,15 @@ export const getUserStreakInfoService = async (userId: string) => {
 };
 
 export const initializeStreak = async (
-  userId: string
+  userId: string,
+  createdDate: string
 ): Promise<GlobalResponse> => {
   try {
-    const newUserStreak = await createUserStreakService(userId);
+    const newUserStreak = await createUserStreakService(userId, createdDate);
 
     if (!newUserStreak.ok) throw new Error("User streak creation failed");
 
-    const userActivity = await createStreakActivityService(userId);
+    const userActivity = await createStreakActivityService(userId, createdDate);
 
     if (!userActivity.ok) throw new Error("User activity creation failed");
 
@@ -166,7 +167,7 @@ export const extendStreakService = async ({
 }: {
   userId: string;
   userStreak: UserStreak;
-  completedAt?: string;
+  completedAt: string;
 }): Promise<GlobalResponse> => {
   try {
     const userActivity = await createStreakActivityService(userId, completedAt);
@@ -211,36 +212,37 @@ export const extendStreakService = async ({
 };
 
 export const getHasPrayedTodayService = async (
-  userId: string
-): Promise<GlobalResponse> => {
-  const today = dayjs().format("YYYY-MM-DD HH:mm");
-  const todayUTC = dayjs(new Date().toISOString()).format("YYYY-MM-DD HH:mm");
-
-  console.log("today", today);
-  console.log("todayUTC", todayUTC);
+  userId: string,
+  completedAt: string
+) => {
   const { data, error } = await supabase
     .from("streak_activity")
     .select("*")
     .eq("user_id", userId)
-    .eq("completed_at", today);
+    .eq("completed_at", completedAt);
 
   if (error) {
     console.log("error in getHasPrayedTodayService", error);
-    return {
-      ok: false,
-      message: "Not found user's prayed today",
+    return createResponse({
+      message: "Error retrieving user's prayed today",
       data: null,
-      dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
-    };
+      statusCode: 500,
+    });
   }
 
-  console.log("data", dayjs(data[0].created_at).format("YYYY-MM-DD HH:mm"));
-  return {
-    ok: true,
+  if (data.length === 0) {
+    return createResponse({
+      message: "Not found user's prayed today",
+      data: null,
+      detail: "Not found user's prayed today",
+      statusCode: 404,
+    });
+  }
+
+  return createResponse({
     message: "Found user's prayed today",
     data: data as StreakActivity[],
-    dateTime: new Date().toISOString(),
     detail: "Streak activity retrieved successfully",
-  };
+  });
 };
