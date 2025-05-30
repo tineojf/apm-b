@@ -17,7 +17,6 @@ export const registerUser = async (
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
       { email, password }
     );
-    console.log("SignUp Data:", signUpData);
 
     if (signUpError) {
       throw new Error(signUpError.message);
@@ -70,7 +69,7 @@ export const loginUser = async (
   });
 
   if (error) {
-    console.error("Login error:", error.message);
+    // console.error("Login error:", error.message);
     return {
       ok: false,
       message: "Error logging in",
