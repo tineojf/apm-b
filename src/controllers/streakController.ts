@@ -7,6 +7,7 @@ import {
 } from "../services/streakService";
 import { getUserStreakByUserId } from "../services/userStreakService";
 import { getStreakActivityService } from "../services/streakActivityService";
+import { StreakActivityDTO } from "../validators/dateStringValidator";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);
@@ -16,12 +17,13 @@ export const getStreakInfoController = async (req: Request, res: Response) => {
 
 export const updateStreakController = async (req: Request, res: Response) => {
   const user = req.user!;
+  const { completedAt } = req.body as StreakActivityDTO;
 
   const userStreak = await getUserStreakByUserId(user.id);
 
   // If user streak is not found, create a new user streak and streak activity
   if (!userStreak) {
-    const resp = await initializeStreak(user.id);
+    const resp = await initializeStreak(user.id, completedAt);
     res.status(resp.ok ? 200 : 409).json(resp);
     return;
   }
@@ -37,6 +39,7 @@ export const updateStreakController = async (req: Request, res: Response) => {
   const resp = await extendStreakService({
     userId: user.id,
     userStreak: userStreak,
+    completedAt: completedAt,
   });
 
   res.status(resp.ok ? 200 : 409).json(resp);

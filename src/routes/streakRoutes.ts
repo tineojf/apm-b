@@ -6,6 +6,8 @@ import {
   getHasPrayedTodayController,
 } from "../controllers/streakController";
 import { authenticate } from "../middleware/validateJwt";
+import { validate } from "../middleware/validate";
+import { streakActivitySchema } from "../validators/dateStringValidator";
 
 const streakRoutes = Router();
 
@@ -13,7 +15,7 @@ streakRoutes.use(authenticate);
 
 streakRoutes.get("/info", getStreakInfoController);
 
-streakRoutes.post("/update", updateStreakController);
+streakRoutes.post("/update", validate(streakActivitySchema), updateStreakController);
 
 streakRoutes.get("/has-prayed-today", getHasPrayedTodayController);
 
