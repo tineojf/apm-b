@@ -21,7 +21,7 @@ streakRoutes.post(
   updateStreakController
 );
 
-streakRoutes.get(
+streakRoutes.post(
   "/has-prayed-today",
   validate(streakActivitySchema),
   getHasPrayedTodayController
