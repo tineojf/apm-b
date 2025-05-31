@@ -1,9 +1,16 @@
 export interface GlobalResponse<T> {
-  ok?: boolean;
+  ok: boolean;
   message: string;
   data: T;
-  dateTime?: Date;
+  dateTime: string;
   detail: string;
+  statusCode: number;
+}
+
+interface GlobalResponseProp<T> {
+  message?: string;
+  data: T;
+  detail?: string;
   statusCode?: number;
 }
 
@@ -12,7 +19,7 @@ export const createResponse = <T>({
   data = {} as T,
   detail = "",
   statusCode = 200,
-}: GlobalResponse<T>) => ({
+}: GlobalResponseProp<T>): GlobalResponse<T> => ({
   ok: statusCode >= 200 && statusCode < 300,
   message,
   data,
