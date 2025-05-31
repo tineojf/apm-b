@@ -54,3 +54,38 @@ export const getAllStreakActivityByUserId = async (
     detail: "Streak activity retrieved successfully",
   });
 };
+
+export const getStreakActivityByUserIdAndCompletedAt = async (
+  userId: string,
+  completedAt: string
+): Promise<GlobalResponse<StreakActivity[] | null>> => {
+  const { data, error } = await supabase
+    .from("streak_activity")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("completed_at", completedAt);
+
+  if (error) {
+    return createResponse({
+      message: "Error retrieving user's prayed today",
+      data: null,
+      detail: error?.message ?? "Unknown error",
+      statusCode: 500,
+    });
+  }
+
+  if (data.length === 0) {
+    return createResponse({
+      message: "Not found user's prayed today",
+      data: null,
+      detail: "Not found user's prayed today",
+      statusCode: 404,
+    });
+  }
+
+  return createResponse({
+    message: "Found user's prayed today",
+    data: data as StreakActivity[],
+    detail: "Streak activity retrieved successfully",
+  });
+};
