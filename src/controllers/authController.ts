@@ -12,7 +12,7 @@ export const registerUser = async (
   if (response.ok) {
     res.status(201).json(response);
   } else {
-    res.status(400).json(response);
+    res.status(409).json(response);
   }
 };
 

@@ -5,7 +5,6 @@ import { GlobalResponse } from "../models/globalResponseModel";
 import { fetchProfileByUserId } from "./profileService";
 import { toLoginDTO } from "../mappers/authMapper";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
-import { toUserDTO } from "../mappers/userMapper";
 
 dotenv.config();
 
@@ -40,12 +39,12 @@ export const registerUser = async (
       throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
-    const userDTO = toUserDTO(user, fullName);
+    const loginDTO = toLoginDTO(signUpData, signUpData.user);
 
     return {
       ok: true,
       message: "User registered successfully",
-      data: userDTO,
+      data: loginDTO,
       dateTime: new Date().toISOString(),
       detail: "User registration successful",
     };
@@ -70,7 +69,7 @@ export const loginUser = async (
   });
 
   if (error) {
-    console.error("Login error:", error.message);
+    // console.error("Login error:", error.message);
     return {
       ok: false,
       message: "Error logging in",
