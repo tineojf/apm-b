@@ -2,7 +2,8 @@ import { z } from "zod";
 
 export enum Role {
   USER = "user",
-  BOT = "assistant",
+  ASSISTANT = "assistant",
+  SYSTEM = "system",
 }
 
 export const streamingSchema = z.object({
@@ -10,10 +11,10 @@ export const streamingSchema = z.object({
     .array(
       z.object({
         content: z.string().nonempty("Message content is required"),
-        role: z.enum([Role.USER, Role.BOT]),
+        role: z.enum([Role.USER, Role.ASSISTANT, Role.SYSTEM]),
       })
     )
     .min(1, "Default message is required"),
 });
 
-export type StreamDTO = z.infer<typeof streamingSchema>;
+export type StreamingDTO = z.infer<typeof streamingSchema>;
