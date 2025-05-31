@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
+import { StreakActivityDTO } from "../validators/dateStringValidator";
 import {
   extendStreakService,
   getUserStreakInfoService,
   initializeStreak,
-  getHasPrayedTodayService,
 } from "../services/streakService";
 import { getUserStreakByUserId } from "../services/userStreakService";
-import { getAllStreakActivityByUserId } from "../services/streakActivityService";
-import { StreakActivityDTO } from "../validators/dateStringValidator";
+import {
+  getAllStreakActivityByUserId,
+  getStreakActivityByUserIdAndCompletedAt,
+} from "../services/streakActivityService";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);
@@ -29,12 +31,13 @@ export const updateStreakController = async (req: Request, res: Response) => {
   }
 
   // If user has prayed today, return the response
-  const prayedToday = await getHasPrayedTodayService(user.id, completedAt);
+  const prayedToday = await getStreakActivityByUserIdAndCompletedAt(
+    user.id,
+    completedAt
+  );
 
-  if (prayedToday.ok) {
-    res
-      .status(403)
-      .json({ ...prayedToday, detail: "User has already prayed today" });
+  if (prayedToday) {
+    res.status(403).json({ message: "User completed today's streak" });
     return;
   }
 
@@ -62,10 +65,10 @@ export const getHasPrayedTodayController = async (
 ) => {
   const { completedAt } = req.body as StreakActivityDTO;
 
-  const hasPrayedToday = await getHasPrayedTodayService(
+  const streakActivity = await getStreakActivityByUserIdAndCompletedAt(
     req.user!.id,
     completedAt
   );
 
-  res.status(hasPrayedToday.statusCode).json(hasPrayedToday);
+  res.status(streakActivity.statusCode).json(streakActivity);
 };
