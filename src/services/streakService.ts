@@ -181,8 +181,6 @@ export const extendStreakService = async ({
       last_completed_date: completedAt,
     });
 
-    if (updatedStreak) throw new Error("User streak update failed");
-
     return createResponse({
       message: "User streak and activity updated successfully",
       data: {
