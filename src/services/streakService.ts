@@ -1,11 +1,10 @@
 import dayjs from "../config/dayjs";
-import { supabase } from "../utils/supabaseClient";
 import {
   createUserStreakService,
   getUserStreakByUserId,
   updateUserStreak,
 } from "./userStreakService";
-import { StreakActivity, UserStreak } from "../types/supabase";
+import { UserStreak } from "../types/supabase";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { createResponse } from "../utils/globalResponse";
 import { createStreakActivityService } from "./streakActivityService";
@@ -200,40 +199,4 @@ export const extendStreakService = async ({
       statusCode: 500,
     });
   }
-};
-
-export const getHasPrayedTodayService = async (
-  userId: string,
-  completedAt: string
-) => {
-  const { data, error } = await supabase
-    .from("streak_activity")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("completed_at", completedAt);
-
-  if (error) {
-    console.log("error in getHasPrayedTodayService", error);
-    return createResponse({
-      message: "Error retrieving user's prayed today",
-      data: null,
-      detail: error?.message ?? "Unknown error",
-      statusCode: 500,
-    });
-  }
-
-  if (data.length === 0) {
-    return createResponse({
-      message: "Not found user's prayed today",
-      data: null,
-      detail: "Not found user's prayed today",
-      statusCode: 404,
-    });
-  }
-
-  return createResponse({
-    message: "Found user's prayed today",
-    data: data as StreakActivity[],
-    detail: "Streak activity retrieved successfully",
-  });
 };
