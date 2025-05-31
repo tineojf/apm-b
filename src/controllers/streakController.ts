@@ -36,7 +36,7 @@ export const updateStreakController = async (req: Request, res: Response) => {
     completedAt
   );
 
-  if (prayedToday) {
+  if (prayedToday.data) {
     res.status(403).json({ message: "User completed today's streak" });
     return;
   }
