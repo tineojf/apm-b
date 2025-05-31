@@ -1,11 +1,12 @@
-import { GlobalResponse } from "../models/globalResponseModel";
-import { StreakActivity } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
+
+import { type StreakActivity } from "../types/supabase";
+import { createResponse, type GlobalResponse } from "../utils/globalResponse";
 
 export const createStreakActivityService = async (
   userId: string,
   completedAt: string
-): Promise<GlobalResponse> => {
+): Promise<GlobalResponse<StreakActivity | null>> => {
   const { data, error } = await supabase
     .from("streak_activity")
     .insert({
@@ -16,26 +17,23 @@ export const createStreakActivityService = async (
     .single();
 
   if (error)
-    return {
-      ok: false,
+    return createResponse({
       message: "Streak activity creation failed",
       data: null,
-      dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
-    };
+      statusCode: 500,
+    });
 
-  return {
-    ok: true,
+  return createResponse({
     message: "Streak activity created successfully",
     data: data as StreakActivity,
-    dateTime: new Date().toISOString(),
     detail: "Streak activity created successfully",
-  };
+  });
 };
 
-export const getStreakActivityService = async (
+export const getAllStreakActivityByUserId = async (
   userId: string
-): Promise<GlobalResponse> => {
+): Promise<GlobalResponse<StreakActivity[]>> => {
   const { data, error } = await supabase
     .from("streak_activity")
     .select("*")
@@ -43,19 +41,16 @@ export const getStreakActivityService = async (
     .order("completed_at", { ascending: false });
 
   if (error)
-    return {
-      ok: false,
+    return createResponse({
       message: "Streak activity retrieval failed",
-      data: null,
-      dateTime: new Date().toISOString(),
+      data: [],
       detail: error?.message ?? "Unknown error",
-    };
+      statusCode: 500,
+    });
 
-  return {
-    ok: true,
+  return createResponse({
     message: "Streak activity retrieved successfully",
     data: data as StreakActivity[],
-    dateTime: new Date().toISOString(),
     detail: "Streak activity retrieved successfully",
-  };
+  });
 };

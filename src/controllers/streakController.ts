@@ -6,7 +6,7 @@ import {
   getHasPrayedTodayService,
 } from "../services/streakService";
 import { getUserStreakByUserId } from "../services/userStreakService";
-import { getStreakActivityService } from "../services/streakActivityService";
+import { getAllStreakActivityByUserId } from "../services/streakActivityService";
 import { StreakActivityDTO } from "../validators/dateStringValidator";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
@@ -51,9 +51,9 @@ export const getStreakActivityController = async (
   req: Request,
   res: Response
 ) => {
-  const streakActivity = await getStreakActivityService(req.user!.id);
+  const streakActivity = await getAllStreakActivityByUserId(req.user!.id);
 
-  res.status(streakActivity.ok ? 200 : 409).json(streakActivity);
+  res.status(streakActivity.statusCode).json(streakActivity);
 };
 
 export const getHasPrayedTodayController = async (
