@@ -32,7 +32,9 @@ export const updateStreakController = async (req: Request, res: Response) => {
   const prayedToday = await getHasPrayedTodayService(user.id, completedAt);
 
   if (prayedToday.ok) {
-    res.status(200).json(prayedToday);
+    res
+      .status(403)
+      .json({ ...prayedToday, detail: "User has already prayed today" });
     return;
   }
 
@@ -42,7 +44,7 @@ export const updateStreakController = async (req: Request, res: Response) => {
     completedAt: completedAt,
   });
 
-  res.status(resp.ok ? 200 : 409).json(resp);
+  res.status(resp.statusCode).json(resp);
 };
 
 export const getStreakActivityController = async (

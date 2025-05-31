@@ -168,7 +168,7 @@ export const extendStreakService = async ({
   userId: string;
   userStreak: UserStreak;
   completedAt: string;
-}): Promise<GlobalResponse> => {
+}) => {
   try {
     const userActivity = await createStreakActivityService(userId, completedAt);
 
@@ -176,38 +176,29 @@ export const extendStreakService = async ({
 
     const newCurrentStreak = userStreak.current_streak + 1;
 
-    const { data: updatedStreak, error: updateError } = await supabase
-      .from("user_streaks")
-      .update({
-        current_streak: newCurrentStreak,
-        longest_streak: Math.max(userStreak.longest_streak, newCurrentStreak),
-        last_completed_date: completedAt ?? new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", userId)
-      .select()
-      .single();
+    const updatedStreak = await updateUserStreak(userId, {
+      current_streak: newCurrentStreak,
+      longest_streak: Math.max(userStreak.longest_streak, newCurrentStreak),
+      last_completed_date: completedAt,
+    });
 
-    if (updateError) throw new Error("User streak update failed");
+    if (updatedStreak) throw new Error("User streak update failed");
 
-    return {
-      ok: true,
+    return createResponse({
       message: "User streak and activity updated successfully",
       data: {
         userStreak: updatedStreak,
         streakActivity: userActivity.data,
       },
-      dateTime: new Date().toISOString(),
       detail: "User streak and activity updated successfully",
-    };
+    });
   } catch (error: any) {
-    return {
-      ok: false,
+    return createResponse({
       message: "Failed to update user streak",
       data: null,
-      dateTime: new Date().toISOString(),
       detail: error?.message ?? "Unknown error",
-    };
+      statusCode: 500,
+    });
   }
 };
 
