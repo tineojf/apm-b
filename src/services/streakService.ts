@@ -9,10 +9,14 @@ import { GlobalResponse } from "../models/globalResponseModel";
 import { createResponse } from "../utils/globalResponse";
 import { createStreakActivityService } from "./streakActivityService";
 
+const INITIAL_LIVES = 3;
+const MIN_STREAK = 0;
+const MAX_INACTIVE_DAYS = 3;
+
 const resetStreak = async (userId: string): Promise<UserStreak> => {
   return updateUserStreak(userId, {
-    current_streak: 0,
-    remaining_lives: 3,
+    current_streak: MIN_STREAK,
+    remaining_lives: INITIAL_LIVES,
     last_lives_reset: new Date().toISOString(),
   });
 };
@@ -33,6 +37,17 @@ const deductLives = async (
   });
 };
 
+const shouldResetMonthlyLives = (lastCompletedDate: string): boolean => {
+  const today = dayjs();
+  const lastCompleted = dayjs(lastCompletedDate);
+
+  // Verifica si el mes actual es diferente al último completado
+  return (
+    today.month() !== lastCompleted.month() ||
+    today.year() !== lastCompleted.year()
+  );
+};
+
 export const getUserStreakInfoService = async (userId: string) => {
   try {
     const userStreak = await getUserStreakByUserId(userId);
@@ -49,6 +64,46 @@ export const getUserStreakInfoService = async (userId: string) => {
     const lastUpdate = dayjs(userStreak.updated_at);
     const today = dayjs();
 
+    // Verificar si es un mes diferente al último completado
+    if (
+      shouldResetMonthlyLives(userStreak.last_completed_date) &&
+      shouldResetMonthlyLives(userStreak.last_lives_reset)
+    ) {
+      const daysSinceLastCompletion = today.diff(
+        dayjs(userStreak.last_completed_date),
+        "day"
+      );
+
+      console.log("Days since last completion", daysSinceLastCompletion);
+
+      // Si el usuario no completó el desafío en más de 3 días, resetear el streak
+      if (daysSinceLastCompletion > MAX_INACTIVE_DAYS) {
+        const resetStreak_ = await resetStreak(userId);
+
+        console.log("Streak reset due to inactivity", resetStreak_);
+        return createResponse({
+          message: "Streak reset due to inactivity",
+          data: resetStreak_,
+          detail: `Streak reset due to ${daysSinceLastCompletion} days of inactivity. Lives reset to ${INITIAL_LIVES} for the new month.`,
+        });
+      }
+
+      // Si el usuario completó el desafío en los últimos 3 días, solo resetear las vidas
+      const updatedStreak = await updateUserStreak(userId, {
+        remaining_lives: INITIAL_LIVES,
+        last_lives_reset: new Date().toISOString(),
+      });
+
+      console.log("Monthly lives reset", updatedStreak);
+
+      return createResponse({
+        message: "Monthly lives reset",
+        data: updatedStreak,
+        detail: `Lives reset to ${INITIAL_LIVES} for the new month. Streak maintained.`,
+      });
+    }
+
+    // Verificar si el usuario ya validó hoy
     if (lastUpdate.isSame(today, "day")) {
       console.log("User streak found - Already validated today");
       return createResponse({
@@ -62,6 +117,7 @@ export const getUserStreakInfoService = async (userId: string) => {
     const yesterday = today.subtract(1, "day").startOf("day");
     const daysSinceLastCompletion = today.diff(lastCompletedDate, "day");
 
+    // Verificar si el usuario completó el desafío el día anterior
     if (lastCompletedDate.isSame(yesterday, "day")) {
       console.log("User streak found - Last completion was yesterday");
       return createResponse({
@@ -71,17 +127,11 @@ export const getUserStreakInfoService = async (userId: string) => {
       });
     }
 
-    if (daysSinceLastCompletion > 3) {
-      const updatedStreak = await resetStreak(userId);
-      console.log("User streak reset due to inactivity", updatedStreak);
-      return createResponse({
-        message: "User streak reset due to inactivity",
-        data: updatedStreak,
-        detail: "User streak reset due to inactivity",
-      });
-    }
-
-    if (daysSinceLastCompletion <= 3 && daysSinceLastCompletion > 1) {
+    // Verificar si el usuario completó el desafío en los últimos 3 días
+    if (
+      daysSinceLastCompletion <= MAX_INACTIVE_DAYS &&
+      daysSinceLastCompletion > 1
+    ) {
       const daysToDeduct = daysSinceLastCompletion - 1;
       const updatedStreak = await deductLives(
         userId,
@@ -90,12 +140,12 @@ export const getUserStreakInfoService = async (userId: string) => {
       );
 
       const message =
-        updatedStreak.remaining_lives === 3
+        updatedStreak.remaining_lives === INITIAL_LIVES
           ? "User streak reset due to no remaining lives"
           : "User streak updated - Lives deducted";
 
       const detail = `Streak ${
-        updatedStreak.remaining_lives === 3 ? "reset" : "maintained"
+        updatedStreak.remaining_lives === INITIAL_LIVES ? "reset" : "maintained"
       } - Lost ${daysToDeduct} lives due to ${daysSinceLastCompletion} days of inactivity. ${
         updatedStreak.remaining_lives
       } lives remaining`;
@@ -109,11 +159,13 @@ export const getUserStreakInfoService = async (userId: string) => {
       });
     }
 
-    console.log("User streak found - No changes needed", userStreak);
+    // Verificar si el usuario no completó el desafío en más de 3 días
+    const updatedStreak = await resetStreak(userId);
+    console.log("User streak reset due to inactivity", updatedStreak);
     return createResponse({
-      message: "User streak found - No changes needed",
-      data: userStreak,
-      detail: "User streak found - No changes needed",
+      message: "User streak reset due to inactivity",
+      data: updatedStreak,
+      detail: "Streak reset - More than 3 days of inactivity",
     });
   } catch (error: any) {
     return createResponse({
@@ -169,6 +221,33 @@ export const extendStreakService = async ({
   completedAt: string;
 }) => {
   try {
+    const completedAtStartOfDay = dayjs(completedAt).startOf("day");
+    const lastCompletedDate = dayjs(userStreak.last_completed_date).startOf(
+      "day"
+    );
+    const serverDate = dayjs().startOf("day");
+
+    // Validar que la fecha no sea futura
+    if (completedAtStartOfDay.isAfter(serverDate)) {
+      return createResponse({
+        message: "Invalid completion date",
+        data: null,
+        detail: "Cannot complete streak for future dates",
+        statusCode: 400,
+      });
+    }
+
+    // Validar que la fecha no sea anterior al último registro
+    // Todo: Que pasaria si el usuario su ultimo registro es hace 5 dias, podra completar los 5 dias?
+    if (completedAtStartOfDay.isBefore(lastCompletedDate)) {
+      return createResponse({
+        message: "Invalid completion date",
+        data: null,
+        detail: "Cannot complete streak for past dates",
+        statusCode: 400,
+      });
+    }
+
     const userActivity = await createStreakActivityService(userId, completedAt);
 
     if (!userActivity.ok) throw new Error("User activity creation failed");
