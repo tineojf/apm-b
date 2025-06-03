@@ -1,9 +1,11 @@
 export const generatePrayer = (answer: string) => {
   return `Write a 55-word Catholic prayer that reflects:
   - My current relationship with God: ${answer}
-  - A time of social, economic, or spiritual hardship (as background context)
-  The prayer must be hopeful and spiritual, but do not directly mention any country or specific event. End with a Bible verse.`;
+  - A context of social, economic, or spiritual hardship
+  The prayer should be hopeful, spiritual, and aligned with Catholic tradition (e.g., may include thanksgiving, petition, or intercession). Do not mention any country or specific event.
+  Conclude with a Bible verse that reinforces the message of the prayer.`;
 };
+
 
 export const generateCitation = `Return a random Bible verse in the following format:
   "phrase" - author:verse
