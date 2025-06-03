@@ -7,4 +7,5 @@ export const generatePrayer = (answer: string) => {
 
 export const generateCitation = `Return a random Bible verse in the following format:
   "phrase" - author:verse
+  The verse must be contextually related to the current day. If we are near a significant Christian observance (e.g. Easter, Christmas, Lent, Pentecost), choose a verse that reflects that theme, considering the general Christian calendar (Catholic, Protestant, or Orthodox).
   Do not repeat a previously used verse. Only return the citation, with no explanations.`;
