@@ -19,7 +19,11 @@ export const relationshipChat = async (req: Request, res: Response) => {
     ...messages,
   ];
 
-  await streamChat(res, { messages: conversationWithSystem });
+  await streamChat(res, {
+    messages: conversationWithSystem,
+    maxTokens: 400,
+    temperature: 0.3,
+  });
 };
 
 export const lifeChallengesChat = async (req: Request, res: Response) => {
