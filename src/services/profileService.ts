@@ -68,3 +68,33 @@ export const createProfileService = async (
     detail: "Profile created successfully",
   };
 };
+
+export const updateProfileService = async (
+  userId: string,
+  profileData: any
+): Promise<GlobalResponse> => {
+  const { data, error } = await supabase
+    .from("profile")
+    .update({ full_name: profileData.full_name })
+    .eq("id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    return {
+      ok: false,
+      message: "Error updating profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    };
+  }
+
+  return {
+    ok: true,
+    message: "Profile updated successfully",
+    data: data as Profile,
+    dateTime: new Date().toISOString(),
+    detail: "Profile updated successfully",
+  };
+};
