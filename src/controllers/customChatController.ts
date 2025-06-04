@@ -45,7 +45,11 @@ export const forgivenessChat = async (req: Request, res: Response) => {
     ...messages,
   ];
 
-  await streamChat(res, { messages: conversationWithSystem });
+  await streamChat(res, {
+    messages: conversationWithSystem,
+    maxTokens: 400,
+    temperature: 0.4,
+  });
 };
 
 export const prayerChat = async (req: Request, res: Response) => {
