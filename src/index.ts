@@ -19,8 +19,7 @@ app.use(express.json());
 // Routes
 app.get("/", (req, res) => {
   res.status(200).json({
-    message:
-      "Welcome to the API, please use /api/v1/auth/register or /api/v1/auth/login",
+    message: "API is running. Use the endpoints provided in the documentation.",
   });
 });
 

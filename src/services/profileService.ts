@@ -11,6 +11,10 @@ export const fetchProfileByUserId = async (
     .eq("id", userId)
     .single();
 
+  if (data === null) {
+    return { profile: null, error: new Error("Profile not found") };
+  }
+
   if (error) {
     return { profile: null, error };
   }
@@ -40,20 +44,21 @@ export const getProfileService = async (
   };
 };
 
-export const createProfileService = async (
+export const updateProfileService = async (
   userId: string,
   profileData: any
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("profile")
-    .insert({ id: userId, full_name: profileData.fullName })
+    .update({ full_name: profileData.full_name })
+    .eq("id", userId)
     .select()
     .single();
 
   if (error) {
     return {
       ok: false,
-      message: "Error creating profile",
+      message: "Error updating profile",
       data: null,
       dateTime: new Date().toISOString(),
       detail: error.message,
@@ -62,9 +67,9 @@ export const createProfileService = async (
 
   return {
     ok: true,
-    message: "Profile created successfully",
+    message: "Profile updated successfully",
     data: data as Profile,
     dateTime: new Date().toISOString(),
-    detail: "Profile created successfully",
+    detail: "Profile updated successfully",
   };
 };
