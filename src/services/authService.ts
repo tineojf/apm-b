@@ -46,7 +46,7 @@ export const registerUser = async (
 
     return {
       ok: true,
-      message: "User registered successfully",
+      message: "User registered successfully " + fullName,
       data: loginDTO,
       dateTime: new Date().toISOString(),
       detail: "User registration successful",
