@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { supabase } from "../utils/supabaseClient";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { fetchProfileByUserId } from "./profileService";
-import { toLoginDTO } from "../mappers/authMapper";
+import { toLoginDTO, toLoginDTO2 } from "../mappers/authMapper";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
 
 dotenv.config();
@@ -39,7 +39,7 @@ export const registerUser = async (
       throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
-    const loginDTO = toLoginDTO(signUpData, signUpData.user);
+    const loginDTO = toLoginDTO2(signUpData, fullName);
 
     return {
       ok: true,
