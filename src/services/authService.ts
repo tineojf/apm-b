@@ -39,6 +39,9 @@ export const registerUser = async (
       throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
+    console.log("User registered successfully:", signUpData);
+    console.log("Profile created successfully for user:", fullName);
+
     const loginDTO = toLoginDTO2(signUpData, fullName);
 
     return {
