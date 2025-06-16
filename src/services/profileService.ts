@@ -108,12 +108,32 @@ export const deleteProfileService = async (
 ): Promise<GlobalResponse> => {
   try {
     // Borrar datos relacionados primero
-    await supabase.from("streak_activity").delete().eq("user_id", userId);
-    await supabase.from("user_streaks").delete().eq("user_id", userId);
-    await supabase.from("profile").delete().eq("id", userId);
+    const { error: streakError } = await supabase
+      .from("streak_activity")
+      .delete()
+      .eq("user_id", userId);
+    const { error: userStreaksError } = await supabase
+      .from("user_streaks")
+      .delete()
+      .eq("user_id", userId);
+    const { error: profileError } = await supabase
+      .from("profile")
+      .delete()
+      .eq("id", userId);
 
     // Finalmente, borrar de auth
-    await supabase.auth.admin.deleteUser(userId);
+    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+    if (streakError || userStreaksError || profileError || authError) {
+      return {
+        ok: false,
+        message: "Error deleting profile",
+        data: null,
+        dateTime: new Date().toISOString(),
+        detail: "Error deleting profile",
+      };
+    }
+
     return {
       ok: true,
       message: "Profile deleted successfully",
