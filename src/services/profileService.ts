@@ -102,3 +102,33 @@ export const updateProfileService = async (
     detail: "Profile updated successfully",
   };
 };
+
+export const deleteProfileService = async (
+  userId: string
+): Promise<GlobalResponse> => {
+  try {
+    // Borrar datos relacionados primero
+    await supabase.from("streak_activity").delete().eq("user_id", userId);
+    await supabase.from("user_streaks").delete().eq("user_id", userId);
+    await supabase.from("profile").delete().eq("id", userId);
+
+    // Finalmente, borrar de auth
+    await supabase.auth.admin.deleteUser(userId);
+    return {
+      ok: true,
+      message: "Profile deleted successfully",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: "Profile deleted successfully",
+    };
+  } catch (error) {
+    console.log("error->", error);
+    return {
+      ok: false,
+      message: "Error deleting profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+};
