@@ -50,7 +50,7 @@ export const createProfileService = async (
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("profile")
-    .insert({ id: userId, full_name: profileData.fullName })
+    .insert({ id: userId, full_name: profileData.full_name })
     .select()
     .single();
 
