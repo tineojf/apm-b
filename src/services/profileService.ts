@@ -44,6 +44,35 @@ export const getProfileService = async (
   };
 };
 
+export const createProfileService = async (
+  userId: string,
+  profileData: any
+): Promise<GlobalResponse> => {
+  const { data, error } = await supabase
+    .from("profile")
+    .insert({ id: userId, full_name: profileData.fullName })
+    .select()
+    .single();
+
+  if (error) {
+    return {
+      ok: false,
+      message: "Error creating profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    };
+  }
+
+  return {
+    ok: true,
+    message: "Profile created successfully",
+    data: data as Profile,
+    dateTime: new Date().toISOString(),
+    detail: "Profile created successfully",
+  };
+};
+
 export const updateProfileService = async (
   userId: string,
   profileData: any
