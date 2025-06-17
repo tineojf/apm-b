@@ -3,6 +3,7 @@ import {
   getProfileService,
   createProfileService,
   updateProfileService,
+  deleteProfileService,
 } from "../services/profileService";
 import { ProfileDTO } from "../validators/profile/profileValidator";
 
@@ -51,4 +52,15 @@ export const createProfile = async (
 
   const newProfile = await createProfileService(user.id, body);
   res.status(newProfile.ok ? 201 : 409).json(newProfile);
+};
+
+export const deleteProfile = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const user = req.user!;
+
+  const deletedProfile = await deleteProfileService(user.id);
+
+  res.status(deletedProfile.ok ? 200 : 409).json(deletedProfile);
 };
