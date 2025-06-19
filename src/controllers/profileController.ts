@@ -50,9 +50,7 @@ export const createProfile = async (
       detail: "Returned existing or newly created profile",
     });
   } catch (error: any) {
-    const statusCode = error.message === "Profile already exists" ? 409 : 500;
-
-    res.status(statusCode).json({
+    res.status(500).json({
       ok: false,
       message: "Error creating profile",
       data: null,
