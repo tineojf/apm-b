@@ -2,75 +2,51 @@ import { GlobalResponse } from "../models/globalResponseModel";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 
-export const fetchProfileByUserId = async (
-  userId: string
-): Promise<{ profile: Profile | null; error: Error | null }> => {
+export const getProfileService = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
     .from("profile")
     .select("full_name, is_premium, created_at")
-    .eq("id", userId)
-    .single();
-
-  if (data === null) {
-    return { profile: null, error: new Error("Profile not found") };
-  }
+    .eq("id", userId);
 
   if (error) {
-    return { profile: null, error };
+    throw new Error("Supabase error: " + error.message);
   }
-  return { profile: data as Profile, error: null };
-};
 
-export const getProfileService = async (
-  userId: string
-): Promise<GlobalResponse> => {
-  const { profile, error } = await fetchProfileByUserId(userId);
+  if (!data || data.length === 0) {
+    throw new Error("Profile not found");
+  }
 
-  if (error)
-    return {
-      ok: false,
-      message: "Error fetching profile",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error.message,
-    };
+  if (data.length > 1) {
+    throw new Error("Multiple profiles found for user");
+  }
 
-  return {
-    ok: true,
-    message: "Profile fetched successfully",
-    data: profile,
-    dateTime: new Date().toISOString(),
-    detail: "Profile fetched successfully",
-  };
+  return data[0] as Profile;
 };
 
 export const createProfileService = async (
   userId: string,
-  profileData: any
-): Promise<GlobalResponse> => {
+  body: any
+): Promise<Profile> => {
+  try {
+    const existingProfile = await getProfileService(userId);
+    return existingProfile;
+  } catch (error: any) {
+    if (error.message !== "Profile not found") {
+      throw new Error(error.message);
+    }
+  }
+
   const { data, error } = await supabase
     .from("profile")
-    .insert({ id: userId, full_name: profileData.full_name })
-    .select()
+    .insert({ id: userId, full_name: body.full_name })
+    .select("full_name, is_premium, created_at")
     .single();
 
   if (error) {
-    return {
-      ok: false,
-      message: "Error creating profile",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error.message,
-    };
+    throw new Error("Supabase error: " + error.message);
   }
 
-  return {
-    ok: true,
-    message: "Profile created successfully",
-    data: data as Profile,
-    dateTime: new Date().toISOString(),
-    detail: "Profile created successfully",
-  };
+  return data as Profile;
 };
 
 export const updateProfileService = async (

@@ -7,48 +7,72 @@ import {
 import { ProfileDTO } from "../validators/profile/profileValidator";
 
 export const getProfile = async (req: Request, res: Response): Promise<any> => {
-  const user = req.user!;
+  try {
+    const user = req.user!;
 
-  const profileInfo = await getProfileService(user.id);
-  res.status(profileInfo.ok ? 200 : 409).json(profileInfo);
-};
+    const profile = await getProfileService(user.id);
 
-export const updateProfile = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  const user = req.user!;
-  const body = req.body as ProfileDTO;
+    res.status(200).json({
+      ok: true,
+      message: "Profile fetched successfully",
+      data: profile,
+      dateTime: new Date().toISOString(),
+      detail: "Returned user profile",
+    });
+  } catch (error: any) {
+    const statusCode = error.message === "Profile not found" ? 404 : 500;
 
-  const profileInfo = await getProfileService(user.id);
-  if (!profileInfo.ok) {
-    res.status(404).json(profileInfo);
-    return;
+    res.status(statusCode).json({
+      ok: false,
+      message: "Error fetching profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
   }
-
-  const updatedProfile = await updateProfileService(user.id, body);
-  res.status(updatedProfile.ok ? 200 : 409).json(updatedProfile);
 };
 
 export const createProfile = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const user = req.user!;
-  const body = req.body as ProfileDTO;
+  try {
+    const user = req.user!;
+    const body = req.body as ProfileDTO;
 
-  const profileInfo = await getProfileService(user.id);
+    const profile = await createProfileService(user.id, body);
 
-  if (profileInfo.ok) {
-    return res.status(409).json({
+    return res.status(200).json({
+      ok: true,
+      message: "Profile created or created successfully",
+      data: profile,
+      dateTime: new Date().toISOString(),
+      detail: "Returned existing or newly created profile",
+    });
+  } catch (error: any) {
+    const statusCode = error.message === "Profile already exists" ? 409 : 500;
+
+    res.status(statusCode).json({
       ok: false,
-      message: "Profile already exists",
+      message: "Error creating profile",
       data: null,
       dateTime: new Date().toISOString(),
-      detail: "Profile already exists",
+      detail: error.message,
     });
   }
+};
 
-  const newProfile = await createProfileService(user.id, body);
-  res.status(newProfile.ok ? 201 : 409).json(newProfile);
+export const updateProfile = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  // const user = req.user!;
+  // const body = req.body as ProfileDTO;
+  // const profileInfo = await getProfileService(user.id);
+  // if (!profileInfo.ok) {
+  //   res.status(404).json(profileInfo);
+  //   return;
+  // }
+  // const updatedProfile = await updateProfileService(user.id, body);
+  // res.status(updatedProfile.ok ? 200 : 409).json(updatedProfile);
 };
