@@ -1,14 +1,14 @@
 type CreateProfileInput = {
   id: string;
   body: {
-    full_name: string;
+    fullName: string;
   };
 };
 
 export function mapToProfileEntity({ id, body }: CreateProfileInput) {
   return {
     id: id,
-    full_name: body.full_name,
+    full_name: body.fullName,
     is_premium: false,
   };
 }
