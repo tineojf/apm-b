@@ -1,6 +1,8 @@
+import { mapToProfileEntity } from "../mappers/profileMapper";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
+import { ProfileDTO } from "../validators/profile/profileValidator";
 
 export const getProfileService = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
@@ -24,11 +26,11 @@ export const getProfileService = async (userId: string): Promise<Profile> => {
 };
 
 export const createProfileService = async (
-  userId: string,
-  body: any
+  id: string,
+  body: ProfileDTO
 ): Promise<Profile> => {
   try {
-    const existingProfile = await getProfileService(userId);
+    const existingProfile = await getProfileService(id);
     return existingProfile;
   } catch (error: any) {
     if (error.message !== "Profile not found") {
@@ -36,9 +38,11 @@ export const createProfileService = async (
     }
   }
 
+  const newProfile = mapToProfileEntity({ id, body });
+
   const { data, error } = await supabase
     .from("profile")
-    .insert({ id: userId, full_name: body.full_name })
+    .insert(newProfile)
     .select("full_name, is_premium, created_at")
     .single();
 
@@ -77,4 +81,23 @@ export const updateProfileService = async (
     dateTime: new Date().toISOString(),
     detail: "Profile updated successfully",
   };
+};
+
+export const fetchProfileByUserId = async (
+  userId: string
+): Promise<{ profile: Profile | null; error: Error | null }> => {
+  const { data, error } = await supabase
+    .from("profile")
+    .select("full_name, is_premium, created_at")
+    .eq("id", userId)
+    .single();
+
+  if (data === null) {
+    return { profile: null, error: new Error("Profile not found") };
+  }
+
+  if (error) {
+    return { profile: null, error };
+  }
+  return { profile: data as Profile, error: null };
 };
