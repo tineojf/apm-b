@@ -54,33 +54,29 @@ export const createProfileService = async (
 };
 
 export const updateProfileService = async (
-  userId: string,
-  profileData: any
-): Promise<GlobalResponse> => {
+  id: string,
+  body: any
+): Promise<Profile> => {
+  await getProfileService(id);
+
+  const newProfile = mapToProfileEntity({ id, body });
+
   const { data, error } = await supabase
     .from("profile")
-    .update({ full_name: profileData.full_name })
-    .eq("id", userId)
-    .select()
+    .update(newProfile)
+    .eq("id", id)
+    .select("full_name, is_premium, created_at")
     .single();
 
   if (error) {
-    return {
-      ok: false,
-      message: "Error updating profile",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error.message,
-    };
+    throw new Error("Supabase error: " + error.message);
   }
 
-  return {
-    ok: true,
-    message: "Profile updated successfully",
-    data: data as Profile,
-    dateTime: new Date().toISOString(),
-    detail: "Profile updated successfully",
-  };
+  if (!data) {
+    throw new Error("Profile not found after update");
+  }
+
+  return data as Profile;
 };
 
 export const fetchProfileByUserId = async (

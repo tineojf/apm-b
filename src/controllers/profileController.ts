@@ -64,13 +64,28 @@ export const updateProfile = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  // const user = req.user!;
-  // const body = req.body as ProfileDTO;
-  // const profileInfo = await getProfileService(user.id);
-  // if (!profileInfo.ok) {
-  //   res.status(404).json(profileInfo);
-  //   return;
-  // }
-  // const updatedProfile = await updateProfileService(user.id, body);
-  // res.status(updatedProfile.ok ? 200 : 409).json(updatedProfile);
+  try {
+    const user = req.user!;
+    const body = req.body as ProfileDTO;
+
+    const profile = await updateProfileService(user.id, body);
+
+    res.status(200).json({
+      ok: true,
+      message: "Profile updated successfully",
+      data: profile,
+      dateTime: new Date().toISOString(),
+      detail: "Returned updated user profile",
+    });
+  } catch (error: any) {
+    const statusCode = error.message === "Profile not found" ? 404 : 500;
+
+    res.status(statusCode).json({
+      ok: false,
+      message: "Error updating profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
 };
