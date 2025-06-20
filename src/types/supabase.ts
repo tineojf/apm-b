@@ -23,3 +23,15 @@ export interface Profile {
   is_premium: boolean;
   created_at?: string;
 }
+
+export interface Login {
+  // full_name: string;
+  refresh_token: string;
+  access_token: string;
+}
+
+export interface Register {
+  // full_name: string;
+  refresh_token: string;
+  access_token: string;
+}
