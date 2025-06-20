@@ -14,6 +14,10 @@ type AuthInput = {
 };
 
 type LoginEntity = {
+  user: {
+    id: string;
+    email?: string;
+  };
   session: {
     refresh_token: string;
     access_token: string;
