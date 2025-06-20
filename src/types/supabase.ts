@@ -25,7 +25,7 @@ export interface Profile {
 }
 
 export interface Login {
-  // full_name: string;
+  full_name: string;
   refresh_token: string;
   access_token: string;
 }

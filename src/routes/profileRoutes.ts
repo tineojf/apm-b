@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
   getProfile,
-  updateProfile,
   createProfile,
+  updateProfile,
 } from "../controllers/profileController";
 import { authenticate } from "../middleware/validateJwt";
 import { validate } from "../middleware/validate";

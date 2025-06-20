@@ -1,7 +1,7 @@
 import { mapToProfileEntity } from "../mappers/profileMapper";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
-import { ProfileDTO } from "../validators/profile/profileValidator";
+import { ProfileInput } from "../validators/profile/profileValidator";
 
 export const getProfileService = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
@@ -26,7 +26,7 @@ export const getProfileService = async (userId: string): Promise<Profile> => {
 
 export const createProfileService = async (
   id: string,
-  body: ProfileDTO
+  body: ProfileInput
 ): Promise<Profile> => {
   try {
     const existingProfile = await getProfileService(id);
@@ -54,7 +54,7 @@ export const createProfileService = async (
 
 export const updateProfileService = async (
   id: string,
-  body: any
+  body: ProfileInput
 ): Promise<Profile> => {
   await getProfileService(id);
 
