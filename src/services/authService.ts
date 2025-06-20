@@ -11,6 +11,7 @@ import {
   mapToAuthEntity,
   toLoginDTO2,
 } from "../mappers/authMapper";
+import { getProfileService } from "./profileService";
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ export const loginUserService = async (body: LoginDTO): Promise<any> => {
   const { data, error } = await supabase.auth.signInWithPassword(userEntity);
 
   if (error) {
-    throw new Error(`Supabase error: ${error.message}`);
+    throw new Error(`DB: ${error.message}`);
   }
 
   if (!data || !data.user) {
@@ -28,6 +29,7 @@ export const loginUserService = async (body: LoginDTO): Promise<any> => {
   }
 
   //! search profile for user
+  // const profile = await getProfileService(id);
 
   const user = mapToLoginDTO(data);
   return user as Login;
@@ -41,7 +43,7 @@ export const loginUserService = async (body: LoginDTO): Promise<any> => {
 //   const { data, error } = await supabase.auth.signUp(userEntity);
 
 //   if (error) {
-//     throw new Error(`Supabase error: ${error.message}`);
+//     throw new Error(`DB: ${error.message}`);
 //   }
 
 //   if (!data || !data.user) {
