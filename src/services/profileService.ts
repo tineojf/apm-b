@@ -1,5 +1,4 @@
 import { mapToProfileEntity } from "../mappers/profileMapper";
-import { GlobalResponse } from "../models/globalResponseModel";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 import { ProfileDTO } from "../validators/profile/profileValidator";
@@ -79,6 +78,7 @@ export const updateProfileService = async (
   return data as Profile;
 };
 
+// ! change to new service - authService.ts
 export const fetchProfileByUserId = async (
   userId: string
 ): Promise<{ profile: Profile | null; error: Error | null }> => {
