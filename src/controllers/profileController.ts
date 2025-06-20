@@ -4,7 +4,7 @@ import {
   createProfileService,
   updateProfileService,
 } from "../services/profileService";
-import { ProfileDTO } from "../validators/profile/profileValidator";
+import { ProfileInput } from "../validators/profile/profileValidator";
 
 export const getProfile = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -38,7 +38,7 @@ export const createProfile = async (
 ): Promise<any> => {
   try {
     const user = req.user!;
-    const body = req.body as ProfileDTO;
+    const body = req.body as ProfileInput;
 
     const profile = await createProfileService(user.id, body);
 
@@ -66,7 +66,7 @@ export const updateProfile = async (
 ): Promise<any> => {
   try {
     const user = req.user!;
-    const body = req.body as ProfileDTO;
+    const body = req.body as ProfileInput;
 
     const profile = await updateProfileService(user.id, body);
 
