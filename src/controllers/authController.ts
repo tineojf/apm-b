@@ -1,38 +1,83 @@
 import { Request, Response } from "express";
-import * as authService from "../services/authService";
 import { supabase } from "../utils/supabaseClient";
+import { LoginDTO, RegisterDTO } from "../validators/auth/authValidator";
+import {
+  // registerUserService
+  refreshTokenService,
+  loginUserService,
+} from "../services/authService";
 
-export const registerUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const { email, password, fullName } = req.body;
-  const response = await authService.registerUser(email, password, fullName);
+// export const registerUser = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const body = req.body as RegisterDTO;
 
-  if (response.ok) {
-    res.status(201).json(response);
-  } else {
-    res.status(409).json(response);
-  }
-};
+//     const user = await registerUserService(body);
+
+//     res.status(201).json({
+//       ok: true,
+//       message: "User created successfully",
+//       data: user,
+//       dateTime: new Date().toISOString(),
+//       detail: "Returned newly created user",
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({
+//       ok: false,
+//       message: "Error creating user",
+//       data: null,
+//       dateTime: new Date().toISOString(),
+//       detail: error.message,
+//     });
+//   }
+// };
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
-  const response = await authService.loginUser(email, password);
+  try {
+    const body = req.body as LoginDTO;
 
-  if (response.ok) {
-    res.status(200).json(response);
-  } else {
-    res.status(401).json(response);
+    const user = await loginUserService(body);
+
+    res.status(201).json({
+      ok: true,
+      message: "User logged in successfully",
+      data: user,
+      dateTime: new Date().toISOString(),
+      detail: "Returned user login information",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error logging in user",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
   }
 };
+
+// export const loginUser2 = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   const { email, password } = req.body;
+//   const response = await loginUserService(email);
+
+//   if (response.ok) {
+//     res.status(200).json(response);
+//   } else {
+//     res.status(401).json(response);
+//   }
+// };
 
 export const refreshToken = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { refreshToken } = req.body;
-  const response = await authService.refreshToken(refreshToken);
+  const response = await refreshTokenService(refreshToken);
 
   if (response.ok) {
     res.status(200).json(response);
