@@ -18,16 +18,16 @@ export const registerSchema = z.object({
     .min(6, "Validator: password must be at least 6 characters")
     .max(64, "Validator: password must be less than 64 characters"),
 
-  fullName: z
+  full_name: z
     .string({
-      required_error: "Validator: fullName is required",
-      invalid_type_error: "Validator: fullName must be a string",
+      required_error: "Validator: full_name is required",
+      invalid_type_error: "Validator: full_name must be a string",
     })
     .trim()
-    .min(5, "Validator: fullName must be at least 5 characters")
-    .max(50, "Validator: fullName must be less than 50 characters")
+    .min(5, "Validator: full_name must be at least 5 characters")
+    .max(50, "Validator: full_name must be less than 50 characters")
     .regex(/^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+$/, {
-      message: "Validator: fullName must contain only letters and spaces",
+      message: "Validator: full_name must contain only letters and spaces",
     }),
 });
 
