@@ -1,42 +1,42 @@
 import { Request, Response } from "express";
 import { supabase } from "../utils/supabaseClient";
-import { LoginDTO, RegisterDTO } from "../validators/auth/authValidator";
+import { LoginInput, RegisterInput } from "../validators/auth/authValidator";
 import {
-  // registerUserService
+  registerUserService,
   refreshTokenService,
   loginUserService,
 } from "../services/authService";
 
-// export const registerUser = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const body = req.body as RegisterDTO;
+export const registerUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const body = req.body as RegisterInput;
 
-//     const user = await registerUserService(body);
+    const user = await registerUserService(body);
 
-//     res.status(201).json({
-//       ok: true,
-//       message: "User created successfully",
-//       data: user,
-//       dateTime: new Date().toISOString(),
-//       detail: "Returned newly created user",
-//     });
-//   } catch (error: any) {
-//     res.status(500).json({
-//       ok: false,
-//       message: "Error creating user",
-//       data: null,
-//       dateTime: new Date().toISOString(),
-//       detail: error.message,
-//     });
-//   }
-// };
+    res.status(201).json({
+      ok: true,
+      message: "User created successfully",
+      data: user,
+      dateTime: new Date().toISOString(),
+      detail: "Returned newly created user",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error creating user",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
+};
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const body = req.body as LoginDTO;
+    const body = req.body as LoginInput;
 
     const user = await loginUserService(body);
 
