@@ -50,5 +50,5 @@ export const loginSchema = z.object({
     .max(64, "Validator: password must be less than 64 characters"),
 });
 
-export type RegisterDTO = z.infer<typeof registerSchema>;
-export type LoginDTO = z.infer<typeof loginSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
