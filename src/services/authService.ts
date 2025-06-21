@@ -89,3 +89,34 @@ export const refreshTokenService = async (
     };
   }
 };
+
+export const deleteUserService = async (id: string): Promise<null> => {
+  const { error: streakError } = await supabase
+    .from("streak_activity")
+    .delete()
+    .eq("user_id", id);
+  const { error: userStreaksError } = await supabase
+    .from("user_streaks")
+    .delete()
+    .eq("user_id", id);
+  const { error: profileError } = await supabase
+    .from("profile")
+    .delete()
+    .eq("id", id);
+
+  const { error: authError } = await supabase.auth.admin.deleteUser(id);
+
+  if (streakError || userStreaksError || profileError || authError) {
+    throw new Error(
+      `DB: ${
+        streakError?.message ||
+        userStreaksError?.message ||
+        profileError?.message ||
+        authError?.message ||
+        "Unknown error"
+      }`
+    );
+  }
+
+  return null;
+};

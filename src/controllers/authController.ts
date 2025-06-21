@@ -5,9 +5,10 @@ import {
   registerUserService,
   refreshTokenService,
   loginUserService,
+  deleteUserService,
 } from "../services/authService";
 
-export const registerUser = async (
+export const registerUserController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -34,7 +35,7 @@ export const registerUser = async (
   }
 };
 
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
+export const loginUserController = async (req: Request, res: Response): Promise<void> => {
   try {
     const body = req.body as LoginInput;
 
@@ -87,4 +88,31 @@ export const validateTokenController = async (req: Request, res: Response) => {
   }
 
   res.status(200).json({ valid: true, message: "token valid" });
+};
+
+export const deleteUserController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const user = req.user!;
+
+    await deleteUserService(user.id);
+
+    res.status(200).json({
+      ok: true,
+      message: "Profile deleted successfully",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: "Profile deleted",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error deleting profile",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
 };
