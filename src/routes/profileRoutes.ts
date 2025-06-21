@@ -3,17 +3,17 @@ import { authenticate } from "../middleware/validateJwt";
 import { validate } from "../middleware/validate";
 import { profileSchema } from "../validators/profile/profileValidator";
 import {
-  getProfile,
-  createProfile,
-  updateProfile,
+  getProfileController,
+  createProfileController,
+  updateProfileController,
 } from "../controllers/profileController";
 
 const profileRoutes = Router();
 
 profileRoutes.use(authenticate);
 
-profileRoutes.get("/", getProfile);
-profileRoutes.post("/", validate(profileSchema), createProfile);
-profileRoutes.put("/", validate(profileSchema), updateProfile);
+profileRoutes.get("/", getProfileController);
+profileRoutes.post("/", validate(profileSchema), createProfileController);
+profileRoutes.put("/", validate(profileSchema), updateProfileController);
 
 export default profileRoutes;

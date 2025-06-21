@@ -6,7 +6,7 @@ import {
   updateProfileService,
 } from "../services/profileService";
 
-export const getProfile = async (req: Request, res: Response): Promise<any> => {
+export const getProfileController = async (req: Request, res: Response): Promise<any> => {
   try {
     const user = req.user!;
 
@@ -32,7 +32,7 @@ export const getProfile = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export const createProfile = async (
+export const createProfileController = async (
   req: Request,
   res: Response
 ): Promise<any> => {
@@ -60,7 +60,7 @@ export const createProfile = async (
   }
 };
 
-export const updateProfile = async (
+export const updateProfileController = async (
   req: Request,
   res: Response
 ): Promise<any> => {
