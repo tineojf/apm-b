@@ -1,5 +1,6 @@
 import { LoginDTO } from "../models/loginDTO";
 import { Profile } from "../types/supabase";
+import { LoginInput } from "../validators/auth/authValidator";
 
 export const toLoginDTO2 = (sbResponse: any, fullName: string): LoginDTO => {
   return {
@@ -7,11 +8,6 @@ export const toLoginDTO2 = (sbResponse: any, fullName: string): LoginDTO => {
     refresh_token: sbResponse.session.refresh_token || "",
     access_token: sbResponse.session.access_token || "",
   };
-};
-
-type LoginInput = {
-  email: string;
-  password: string;
 };
 
 type LoginEntity = {
