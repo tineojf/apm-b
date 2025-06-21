@@ -22,10 +22,14 @@ type LoginEntity = {
 };
 
 type RegisterEntity = {
+  user?: {
+    id?: string;
+    email?: string;
+  } | null;
   session: {
     refresh_token?: string;
     access_token?: string;
-  };
+  } | null;
 };
 
 export function mapToAuthEntity(body: LoginInput) {
@@ -43,9 +47,13 @@ export function mapToLoginDTO(authResponse: LoginEntity, profile: Profile) {
   };
 }
 
-export function mapToRegisterDTO(authResponse: RegisterEntity) {
+export function mapToRegisterDTO(
+  authResponse: RegisterEntity,
+  profile: Profile
+) {
   return {
-    refresh_token: authResponse.session.refresh_token || "Not provided",
-    access_token: authResponse.session.access_token || "Not provided",
+    full_name: profile.full_name || "User not provided",
+    refresh_token: authResponse.session?.refresh_token || "Not provided",
+    access_token: authResponse.session?.access_token || "Not provided",
   };
 }

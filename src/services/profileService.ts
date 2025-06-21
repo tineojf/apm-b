@@ -77,23 +77,3 @@ export const updateProfileService = async (
 
   return data as Profile;
 };
-
-// ! change to new service - authService.ts
-export const fetchProfileByUserId = async (
-  userId: string
-): Promise<{ profile: Profile | null; error: Error | null }> => {
-  const { data, error } = await supabase
-    .from("profile")
-    .select("full_name, is_premium, created_at")
-    .eq("id", userId)
-    .single();
-
-  if (data === null) {
-    return { profile: null, error: new Error("Profile not found") };
-  }
-
-  if (error) {
-    return { profile: null, error };
-  }
-  return { profile: data as Profile, error: null };
-};
