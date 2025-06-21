@@ -6,7 +6,6 @@ import {
   getProfile,
   createProfile,
   updateProfile,
-  deleteProfile,
 } from "../controllers/profileController";
 
 const profileRoutes = Router();
@@ -16,6 +15,5 @@ profileRoutes.use(authenticate);
 profileRoutes.get("/", getProfile);
 profileRoutes.post("/", validate(profileSchema), createProfile);
 profileRoutes.put("/", validate(profileSchema), updateProfile);
-profileRoutes.delete("/", deleteProfile);
 
 export default profileRoutes;

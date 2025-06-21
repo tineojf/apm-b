@@ -2,7 +2,6 @@ import { mapToProfileEntity } from "../mappers/profileMapper";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 import { ProfileInput } from "../validators/profile/profileValidator";
-import { GlobalResponse } from "../models/globalResponseModel";
 
 export const getProfileService = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
@@ -77,52 +76,4 @@ export const updateProfileService = async (
   }
 
   return data as Profile;
-};
-
-export const deleteProfileService = async (
-  userId: string
-): Promise<GlobalResponse> => {
-  try {
-    const { error: streakError } = await supabase
-      .from("streak_activity")
-      .delete()
-      .eq("user_id", userId);
-    const { error: userStreaksError } = await supabase
-      .from("user_streaks")
-      .delete()
-      .eq("user_id", userId);
-    const { error: profileError } = await supabase
-      .from("profile")
-      .delete()
-      .eq("id", userId);
-
-    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-
-    if (streakError || userStreaksError || profileError || authError) {
-      return {
-        ok: false,
-        message: "Error deleting profile",
-        data: null,
-        dateTime: new Date().toISOString(),
-        detail: "Error deleting profile",
-      };
-    }
-
-    return {
-      ok: true,
-      message: "Profile deleted successfully",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: "Profile deleted successfully",
-    };
-  } catch (error) {
-    console.log("error->", error);
-    return {
-      ok: false,
-      message: "Error deleting profile",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
 };
