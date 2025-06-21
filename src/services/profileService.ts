@@ -10,7 +10,7 @@ export const getProfileService = async (userId: string): Promise<Profile> => {
     .eq("id", userId);
 
   if (error) {
-    throw new Error("Supabase error: " + error.message);
+    throw new Error("DB: " + error.message);
   }
 
   if (!data || data.length === 0) {
@@ -46,7 +46,7 @@ export const createProfileService = async (
     .single();
 
   if (error) {
-    throw new Error("Supabase error: " + error.message);
+    throw new Error("DB: " + error.message);
   }
 
   return data as Profile;
@@ -68,7 +68,7 @@ export const updateProfileService = async (
     .single();
 
   if (error) {
-    throw new Error("Supabase error: " + error.message);
+    throw new Error("DB: " + error.message);
   }
 
   if (!data) {
