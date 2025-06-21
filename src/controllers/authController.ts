@@ -40,7 +40,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     const user = await loginUserService(body);
 
-    res.status(201).json({
+    res.status(200).json({
       ok: true,
       message: "User logged in successfully",
       data: user,
@@ -57,20 +57,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
-
-// export const loginUser2 = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const { email, password } = req.body;
-//   const response = await loginUserService(email);
-
-//   if (response.ok) {
-//     res.status(200).json(response);
-//   } else {
-//     res.status(401).json(response);
-//   }
-// };
 
 export const refreshToken = async (
   req: Request,

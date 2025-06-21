@@ -1,4 +1,5 @@
 import { LoginDTO } from "../models/loginDTO";
+import { Profile } from "../types/supabase";
 
 export const toLoginDTO2 = (sbResponse: any, fullName: string): LoginDTO => {
   return {
@@ -8,7 +9,7 @@ export const toLoginDTO2 = (sbResponse: any, fullName: string): LoginDTO => {
   };
 };
 
-type AuthInput = {
+type LoginInput = {
   email: string;
   password: string;
 };
@@ -31,15 +32,16 @@ type RegisterEntity = {
   };
 };
 
-export function mapToAuthEntity(body: AuthInput) {
+export function mapToAuthEntity(body: LoginInput) {
   return {
     email: body.email,
     password: body.password,
   };
 }
 
-export function mapToLoginDTO(authResponse: LoginEntity) {
+export function mapToLoginDTO(authResponse: LoginEntity, profile: Profile) {
   return {
+    full_name: profile.full_name || "User not provided",
     refresh_token: authResponse.session.refresh_token || "Not provided",
     access_token: authResponse.session.access_token || "Not provided",
   };

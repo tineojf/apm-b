@@ -28,10 +28,9 @@ export const loginUserService = async (body: LoginDTO): Promise<any> => {
     throw new Error("Login failed, no user data returned");
   }
 
-  //! search profile for user
-  // const profile = await getProfileService(id);
+  const profile = await getProfileService(data.user.id);
 
-  const user = mapToLoginDTO(data);
+  const user = mapToLoginDTO(data, profile);
   return user as Login;
 };
 
