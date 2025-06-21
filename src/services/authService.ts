@@ -3,13 +3,23 @@ import dotenv from "dotenv";
 import { supabase } from "../utils/supabaseClient";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
-import { LoginInput, RegisterInput } from "../validators/auth/authValidator";
-import { Login, Register } from "../types/supabase";
-import { createProfileService, getProfileService } from "./profileService";
+import {
+  LoginInput,
+  RegisterInput,
+  UpdateInput,
+} from "../validators/auth/authValidator";
+import { Login, Register, Update } from "../types/supabase";
+import {
+  createProfileService,
+  getProfileService,
+  updateProfileService,
+} from "./profileService";
 import {
   mapToLoginDTO,
   mapToRegisterDTO,
   mapToAuthEntity,
+  mapToUpdateEntity,
+  mapToUpdateDTO,
 } from "../mappers/authMapper";
 
 dotenv.config();
@@ -24,7 +34,6 @@ export const registerUserService = async (
   if (error) {
     throw new Error(`DB: ${error.message}`);
   }
-
   if (!data || !data.user) {
     throw new Error("User registration failed, no user data returned");
   }
@@ -43,7 +52,6 @@ export const loginUserService = async (body: LoginInput): Promise<Login> => {
   if (error) {
     throw new Error(`DB: ${error.message}`);
   }
-
   if (!data || !data.user) {
     throw new Error("Login failed, no user data returned");
   }
@@ -88,6 +96,38 @@ export const refreshTokenService = async (
       detail: error?.response?.data?.msg || error.message || "Unknown error",
     };
   }
+};
+
+export const updateUserService = async (
+  id: string,
+  email: string,
+  body: UpdateInput
+): Promise<Update> => {
+  const userEntity = mapToUpdateEntity(body, email);
+
+  const { data, error } = await supabase.auth.admin.updateUserById(
+    id,
+    userEntity
+  );
+
+  if (error) {
+    throw new Error(`DB: ${error.message}`);
+  }
+  if (!data || !data.user) {
+    throw new Error("User update failed, no user data returned");
+  }
+
+  let profile;
+  if (body.full_name) {
+    profile = await updateProfileService(id, {
+      full_name: body.full_name,
+    });
+  } else {
+    profile = await getProfileService(id);
+  }
+
+  const user = mapToUpdateDTO(data, profile);
+  return user as Update;
 };
 
 export const deleteUserService = async (id: string): Promise<null> => {

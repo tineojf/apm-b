@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { supabase } from "../utils/supabaseClient";
-import { LoginInput, RegisterInput } from "../validators/auth/authValidator";
+import {
+  LoginInput,
+  RegisterInput,
+  UpdateInput,
+} from "../validators/auth/authValidator";
 import {
   registerUserService,
   refreshTokenService,
@@ -100,9 +104,10 @@ export const updateUserController = async (
 ): Promise<void> => {
   try {
     const user = req.user!;
-    const body = req.body as RegisterInput;
+    const email: string = req.user?.email || "";
+    const body = req.body as UpdateInput;
 
-    const updatedUser = await updateUserService(user.id, body);
+    const updatedUser = await updateUserService(user.id, email, body);
 
     res.status(200).json({
       ok: true,

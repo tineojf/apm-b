@@ -1,5 +1,5 @@
 import { Profile } from "../types/supabase";
-import { LoginInput } from "../validators/auth/authValidator";
+import { LoginInput, UpdateInput } from "../validators/auth/authValidator";
 
 type LoginEntity = {
   user: {
@@ -35,6 +35,19 @@ export function mapToAuthEntity(body: LoginInput) {
     email: body.email,
     password: body.password,
   };
+}
+
+export function mapToUpdateEntity(body: UpdateInput, email: string) {
+  const data: any = {};
+
+  if (body.email) {
+    data.email = body.email.toLowerCase().trim();
+  }
+  if (body.password) {
+    data.password = body.password;
+  }
+
+  return data;
 }
 
 export function mapToLoginDTO(authResponse: LoginEntity, profile: Profile) {
