@@ -24,6 +24,8 @@ export interface Profile {
   created_at?: string;
 }
 
+// DTOs
+
 export interface Login {
   full_name: string;
   refresh_token: string;
@@ -31,7 +33,14 @@ export interface Login {
 }
 
 export interface Register {
-  // full_name: string;
+  full_name: string;
   refresh_token: string;
   access_token: string;
+}
+
+export interface Update {
+  email: string;
+  full_name: string;
+  is_premium: boolean;
+  created_at?: string;
 }

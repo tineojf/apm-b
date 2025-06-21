@@ -23,6 +23,13 @@ type RegisterEntity = {
   } | null;
 };
 
+type UpdateEntity = {
+  user?: {
+    id?: string;
+    email?: string;
+  } | null;
+};
+
 export function mapToAuthEntity(body: LoginInput) {
   return {
     email: body.email,
@@ -46,5 +53,12 @@ export function mapToRegisterDTO(
     full_name: profile.full_name || "User not provided",
     refresh_token: authResponse.session?.refresh_token || "Not provided",
     access_token: authResponse.session?.access_token || "Not provided",
+  };
+}
+
+export function mapToUpdateDTO(authResponse: UpdateEntity, profile: Profile) {
+  return {
+    email: authResponse.user?.email || "Not provided",
+    full_name: profile.full_name || "User not provided",
   };
 }
