@@ -7,6 +7,7 @@ import {
   loginUserController,
   refreshToken,
   validateTokenController,
+  updateUserController,
   deleteUserController,
 } from "../controllers/authController";
 
@@ -16,6 +17,7 @@ authRoutes.post("/register", validate(registerSchema), registerUserController);
 authRoutes.post("/login", validate(loginSchema), loginUserController);
 authRoutes.post("/refresh-token", refreshToken);
 authRoutes.post("/validate-token", validateTokenController);
+authRoutes.put("/update", authenticate, validate(registerSchema), updateUserController);
 authRoutes.delete("/delete", authenticate, deleteUserController);
 
 export default authRoutes;

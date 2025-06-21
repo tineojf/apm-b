@@ -5,6 +5,7 @@ import {
   registerUserService,
   refreshTokenService,
   loginUserService,
+  updateUserService,
   deleteUserService,
 } from "../services/authService";
 
@@ -35,7 +36,10 @@ export const registerUserController = async (
   }
 };
 
-export const loginUserController = async (req: Request, res: Response): Promise<void> => {
+export const loginUserController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const body = req.body as LoginInput;
 
@@ -88,6 +92,34 @@ export const validateTokenController = async (req: Request, res: Response) => {
   }
 
   res.status(200).json({ valid: true, message: "token valid" });
+};
+
+export const updateUserController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = req.user!;
+    const body = req.body as RegisterInput;
+
+    const updatedUser = await updateUserService(user.id, body);
+
+    res.status(200).json({
+      ok: true,
+      message: "User updated successfully",
+      data: updatedUser,
+      dateTime: new Date().toISOString(),
+      detail: "Returned updated user information",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error updating user",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
 };
 
 export const deleteUserController = async (
