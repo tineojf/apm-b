@@ -52,9 +52,10 @@ export function mapToUpdateEntity(body: UpdateInput, email: string) {
 
 export function mapToLoginDTO(authResponse: LoginEntity, profile: Profile) {
   return {
+    email: authResponse.user.email || "Not provided",
     full_name: profile.full_name || "User not provided",
-    refresh_token: authResponse.session.refresh_token || "Not provided",
     access_token: authResponse.session.access_token || "Not provided",
+    refresh_token: authResponse.session.refresh_token || "Not provided",
   };
 }
 
@@ -63,9 +64,10 @@ export function mapToRegisterDTO(
   profile: Profile
 ) {
   return {
+    email: authResponse.user?.email || "Not provided",
     full_name: profile.full_name || "User not provided",
-    refresh_token: authResponse.session?.refresh_token || "Not provided",
     access_token: authResponse.session?.access_token || "Not provided",
+    refresh_token: authResponse.session?.refresh_token || "Not provided",
   };
 }
 

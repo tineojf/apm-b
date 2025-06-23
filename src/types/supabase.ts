@@ -27,15 +27,17 @@ export interface Profile {
 // DTOs
 
 export interface Login {
+  email: string;
   full_name: string;
-  refresh_token: string;
   access_token: string;
+  refresh_token: string;
 }
 
 export interface Register {
+  email: string;
   full_name: string;
-  refresh_token: string;
   access_token: string;
+  refresh_token: string;
 }
 
 export interface Update {
