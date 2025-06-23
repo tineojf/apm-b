@@ -4,6 +4,7 @@ import {
   getProfileService,
   createProfileService,
   updateProfileService,
+  deleteProfileService,
 } from "../services/profileService";
 
 export const getProfileController = async (req: Request, res: Response): Promise<any> => {
@@ -88,4 +89,15 @@ export const updateProfileController = async (
       detail: error.message,
     });
   }
+};
+
+export const deleteProfile = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const user = req.user!;
+
+  const deletedProfile = await deleteProfileService(user.id);
+
+  res.status(deletedProfile.ok ? 200 : 409).json(deletedProfile);
 };
