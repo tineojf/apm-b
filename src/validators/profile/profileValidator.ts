@@ -14,4 +14,4 @@ export const profileSchema = z.object({
     }),
 });
 
-export type ProfileDTO = z.infer<typeof profileSchema>;
+export type ProfileInput = z.infer<typeof profileSchema>;

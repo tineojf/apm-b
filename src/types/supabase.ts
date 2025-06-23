@@ -23,3 +23,26 @@ export interface Profile {
   is_premium: boolean;
   created_at?: string;
 }
+
+// DTOs
+
+export interface Login {
+  email: string;
+  full_name: string;
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface Register {
+  email: string;
+  full_name: string;
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface Update {
+  email: string;
+  full_name: string;
+  is_premium: boolean;
+  created_at?: string;
+}

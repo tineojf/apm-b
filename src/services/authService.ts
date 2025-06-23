@@ -2,119 +2,67 @@ import axios from "axios";
 import dotenv from "dotenv";
 import { supabase } from "../utils/supabaseClient";
 import { GlobalResponse } from "../models/globalResponseModel";
-import { fetchProfileByUserId } from "./profileService";
-import { toLoginDTO, toLoginDTO2 } from "../mappers/authMapper";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
+import {
+  LoginInput,
+  RegisterInput,
+  UpdateInput,
+} from "../validators/auth/authValidator";
+import { Login, Register, Update } from "../types/supabase";
+import {
+  createProfileService,
+  getProfileService,
+  updateProfileService,
+} from "./profileService";
+import {
+  mapToLoginDTO,
+  mapToRegisterDTO,
+  mapToAuthEntity,
+  mapToUpdateEntity,
+  mapToUpdateDTO,
+} from "../mappers/authMapper";
 
 dotenv.config();
 
-export const registerUser = async (
-  email: string,
-  password: string,
-  fullName: string
-): Promise<GlobalResponse> => {
-  try {
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
-      { email, password }
-    );
+export const registerUserService = async (
+  body: RegisterInput
+): Promise<Register> => {
+  const userEntity = mapToAuthEntity(body);
 
-    if (signUpError) {
-      throw new Error(signUpError.message);
-    }
-    if (!signUpData.user) {
-      throw new Error("User registration failed: no user returned");
-    }
-
-    const user = signUpData.user;
-
-    const { error: profileError } = await supabase.from("profile").insert([
-      {
-        id: user.id,
-        full_name: fullName,
-        is_premium: false,
-      },
-    ]);
-
-    if (profileError) {
-      throw new Error(`Profile creation failed: ${profileError.message}`);
-    }
-
-    const loginDTO = toLoginDTO2(signUpData, fullName);
-
-    return {
-      ok: true,
-      message: `User registered successfully`,
-      data: loginDTO,
-      dateTime: new Date().toISOString(),
-      detail: "User registration successful",
-    };
-  } catch (error: any) {
-    return {
-      ok: false,
-      message: "Error signing up",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error?.message ?? "Unknown error",
-    };
-  }
-};
-
-export const loginUser = async (
-  email: string,
-  password: string
-): Promise<GlobalResponse> => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { data, error } = await supabase.auth.signUp(userEntity);
 
   if (error) {
-    // console.error("Login error:", error.message);
-    return {
-      ok: false,
-      message: "Error logging in",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: error.message,
-    };
+    throw new Error(`DB: ${error.message}`);
   }
-
   if (!data || !data.user) {
-    return {
-      ok: false,
-      message: "Login failed, no user data returned",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: "User or session missing after login",
-    };
+    throw new Error("User registration failed, no user data returned");
   }
 
-  const { profile, error: profileError } = await fetchProfileByUserId(
-    data.user.id
-  );
+  const profile = await createProfileService(data.user.id, body);
 
-  if (profileError) {
-    return {
-      ok: false,
-      message: "Error fetching profile",
-      data: null,
-      dateTime: new Date().toISOString(),
-      detail: profileError.message,
-    };
-  }
-
-  const loginDTO = toLoginDTO(data, profile);
-
-  return {
-    ok: true,
-    message: "User logged in successfully",
-    data: loginDTO,
-    dateTime: new Date().toISOString(),
-    detail: "User login successful",
-  };
+  const user = mapToRegisterDTO(data, profile);
+  return user as Register;
 };
 
-export const refreshToken = async (
+export const loginUserService = async (body: LoginInput): Promise<Login> => {
+  const userEntity = mapToAuthEntity(body);
+
+  const { data, error } = await supabase.auth.signInWithPassword(userEntity);
+
+  if (error) {
+    throw new Error(`DB: ${error.message}`);
+  }
+  if (!data || !data.user) {
+    throw new Error("Login failed, no user data returned");
+  }
+
+  const profile = await getProfileService(data.user.id);
+
+  const user = mapToLoginDTO(data, profile);
+  return user as Login;
+};
+
+export const refreshTokenService = async (
   refreshToken: string
 ): Promise<GlobalResponse> => {
   try {
@@ -148,4 +96,67 @@ export const refreshToken = async (
       detail: error?.response?.data?.msg || error.message || "Unknown error",
     };
   }
+};
+
+export const updateUserService = async (
+  id: string,
+  email: string,
+  body: UpdateInput
+): Promise<Update> => {
+  const userEntity = mapToUpdateEntity(body, email);
+
+  const { data, error } = await supabase.auth.admin.updateUserById(
+    id,
+    userEntity
+  );
+
+  if (error) {
+    throw new Error(`DB: ${error.message}`);
+  }
+  if (!data || !data.user) {
+    throw new Error("User update failed, no user data returned");
+  }
+
+  let profile;
+  if (body.full_name) {
+    profile = await updateProfileService(id, {
+      full_name: body.full_name,
+    });
+  } else {
+    profile = await getProfileService(id);
+  }
+
+  const user = mapToUpdateDTO(data, profile);
+  return user as Update;
+};
+
+export const deleteUserService = async (id: string): Promise<null> => {
+  const { error: streakError } = await supabase
+    .from("streak_activity")
+    .delete()
+    .eq("user_id", id);
+  const { error: userStreaksError } = await supabase
+    .from("user_streaks")
+    .delete()
+    .eq("user_id", id);
+  const { error: profileError } = await supabase
+    .from("profile")
+    .delete()
+    .eq("id", id);
+
+  const { error: authError } = await supabase.auth.admin.deleteUser(id);
+
+  if (streakError || userStreaksError || profileError || authError) {
+    throw new Error(
+      `DB: ${
+        streakError?.message ||
+        userStreaksError?.message ||
+        profileError?.message ||
+        authError?.message ||
+        "Unknown error"
+      }`
+    );
+  }
+
+  return null;
 };
