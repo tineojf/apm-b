@@ -9,8 +9,9 @@ export const profileSchema = z.object({
     .trim()
     .min(5, "Validator: full_name must be at least 5 characters")
     .max(50, "Validator: full_name must be less than 50 characters")
-    .regex(/^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+$/, {
-      message: "Validator: full_name must contain only letters and spaces",
+    .regex(/^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ0-9\s._\-+]+$/, {
+      message:
+        "Validator: full_name must contain letters, numbers, spaces, and special characters (._-+)",
     }),
 });
 
