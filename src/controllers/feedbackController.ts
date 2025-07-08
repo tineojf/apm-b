@@ -9,12 +9,12 @@ export const feedbackController = async (
   try {
     const body = req.body as FeedbackInput;
 
-    const user = await sendFeedbackService(body);
+    const feedback = await sendFeedbackService(body);
 
     res.status(201).json({
       ok: true,
       message: "Feedback received successfully",
-      data: user,
+      data: feedback,
       dateTime: new Date().toISOString(),
       detail: null,
     });
