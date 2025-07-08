@@ -3,12 +3,12 @@ import dotenv from "dotenv";
 import { supabase } from "../utils/supabaseClient";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { toRefreshTokenDTO } from "../mappers/tokenMapper";
+import { Login, Register, Update } from "../types/supabase";
 import {
   LoginInput,
   RegisterInput,
   UpdateInput,
 } from "../validators/auth/authValidator";
-import { Login, Register, Update } from "../types/supabase";
 import {
   createProfileService,
   getProfileService,

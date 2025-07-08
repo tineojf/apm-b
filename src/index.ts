@@ -7,6 +7,7 @@ import streakRoutes from "./routes/streakRoutes";
 import profileRoutes from "./routes/profileRoutes";
 import openaiRoutes from "./routes/openaiRoutes";
 import bibleRoutes from "./routes/bibleRoutes";
+import feedbackRoutes from "./routes/feedbackRoutes";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api/v1/streak", streakRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/openai", openaiRoutes);
 app.use("/api/v1/bible", bibleRoutes);
+app.use("/api/v1/feedback", feedbackRoutes);
 
 // Vercel
 export default app;
