@@ -24,6 +24,11 @@ export interface Profile {
   created_at?: string;
 }
 
+export interface Feedback {
+  message: string;
+  created_at: string;
+}
+
 // DTOs
 
 export interface Login {
