@@ -103,28 +103,34 @@ export const updateUserService = async (
   email: string,
   body: UpdateInput
 ): Promise<Update> => {
-  const userEntity = mapToUpdateEntity(body, email);
+  let data;
 
-  const { data, error } = await supabase.auth.admin.updateUserById(
-    id,
-    userEntity
-  );
+  if (body.method === "email") {
+    const userEntity = mapToUpdateEntity(body, email);
 
-  if (error) {
-    throw new Error(`DB: ${error.message}`);
-  }
-  if (!data || !data.user) {
-    throw new Error("User update failed, no user data returned");
-  }
+    const { data: updatedData, error } =
+      await supabase.auth.admin.updateUserById(id, userEntity);
 
-  let profile;
-  if (body.full_name) {
-    profile = await updateProfileService(id, {
-      full_name: body.full_name,
-    });
+    if (error) {
+      throw new Error(`DB: ${error.message}`);
+    }
+    if (!updatedData || !updatedData.user) {
+      throw new Error("User update failed, no user data returned");
+    }
+
+    data = updatedData;
   } else {
-    profile = await getProfileService(id);
+    data = {
+      user: {
+        id,
+        email,
+      },
+    };
   }
+
+  const profile = body.full_name
+    ? await updateProfileService(id, { full_name: body.full_name })
+    : await getProfileService(id);
 
   const user = mapToUpdateDTO(data, profile);
   return user as Update;
