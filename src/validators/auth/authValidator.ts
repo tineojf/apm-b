@@ -82,6 +82,11 @@ export const updateSchema = z.object({
       message: "Validator: full_name must contain only letters and spaces",
     })
     .optional(),
+
+  method: z.enum(["email", "apple"], {
+    required_error: "Validator: method is required",
+    invalid_type_error: "Validator: method must be a string",
+  }),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
