@@ -6,6 +6,7 @@ export const getCitationService = async (): Promise<any> => {
   const { data, error } = await supabase
     .from("phrase")
     .select("phrase, updated_at")
+    .eq("id", 1)
     .single();
 
   if (error) {
