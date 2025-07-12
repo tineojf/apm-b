@@ -19,6 +19,6 @@ export const fetchOpenAIResponse = async (prompt: string): Promise<string> => {
 
     return data.output_text;
   } catch (error: any) {
-    throw new Error("OpenAI Error: " + error.message || error.toString());
+    throw new Error("OpenAI Error: " + (error.message || error.toString()));
   }
 };
