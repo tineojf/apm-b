@@ -1,5 +1,5 @@
 import { generatePrayer, generateCitation } from "../utils/prompts";
-import { fetchOpenAIResponse, fetchOpenAICitation } from "../utils/fetchOpenAI";
+import { fetchOpenAIResponse } from "../utils/fetchOpenAI";
 import { supabase } from "../utils/supabaseClient";
 
 export const getCitationService = async (): Promise<any> => {
@@ -23,7 +23,7 @@ export const getCitationService = async (): Promise<any> => {
   if (currentHour !== updatedHour) {
     let newCitation: string;
     try {
-      newCitation = await fetchOpenAICitation(generateCitation);
+      newCitation = await fetchOpenAIResponse(generateCitation);
     } catch (err) {
       // console.error("Error generating citation:", err);
       return { phrase, updated_at };
@@ -52,7 +52,7 @@ export const getCitationService = async (): Promise<any> => {
   return { phrase, updated_at };
 };
 
-export const createPrayerService = async (answer: string): Promise<any> => {
+export const createPrayerService = async (answer: string): Promise<string> => {
   const prompt = generatePrayer(answer);
   const result = await fetchOpenAIResponse(prompt);
   return result;

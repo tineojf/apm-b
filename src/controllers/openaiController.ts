@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { PrayerInput } from "../validators/openai/openaiValidator";
 import {
   getCitationService,
   createPrayerService,
@@ -27,27 +28,25 @@ export const citationController = async (
   }
 };
 
-export const prayerController = async (req: Request, res: Response) => {
-  const { answer } = req.body;
-
-  const allowedValues = ["bad", "good", "neutral"];
-
-  if (!answer) {
-    res.status(400).json({ error: "Answer is required" });
-    return;
-  }
-
-  if (!allowedValues.includes(answer)) {
-    res
-      .status(400)
-      .json({ error: "Answer must be 'bad', 'good', or 'neutral'" });
-    return;
-  }
-
+export const prayerController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
-    const prayer = await createPrayerService(answer);
-    res.json({ prayer });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to generate prayer" });
+    const body = req.body as PrayerInput;
+
+    const prayer = await createPrayerService(body.answer);
+
+    res.status(200).json({
+      ok: true,
+      message: "Prayer generated successfully",
+      prayer: prayer,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error generating prayer",
+      prayer: null,
+    });
   }
 };
