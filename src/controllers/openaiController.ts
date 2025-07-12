@@ -4,12 +4,26 @@ import {
   createPrayerService,
 } from "../services/openaiService";
 
-export const citationController = async (_req: Request, res: Response) => {
+export const citationController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
     const citation = await getCitationService();
-    res.json({ citation });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch citation" });
+
+    res.status(200).json({
+      ok: true,
+      message: "Citation fetched successfully",
+      citation: citation.phrase,
+      updatedAt: citation.updated_at,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error fetching citation",
+      citation: null,
+      updatedAt: null,
+    });
   }
 };
 
