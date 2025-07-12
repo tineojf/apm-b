@@ -1,5 +1,5 @@
 import { generatePrayer, generateCitation } from "../utils/prompts";
-import { fetchOpenAIResponse } from "../utils/fetchOpenAI";
+import { fetchOpenAIResponse, fetchOpenAICitation } from "../utils/fetchOpenAI";
 import { supabase } from "../utils/supabaseClient";
 
 export const getCitationService = async (): Promise<any> => {
@@ -15,18 +15,41 @@ export const getCitationService = async (): Promise<any> => {
     throw new Error("No citation found");
   }
 
-  const result = data;
-  console.log("getCitationService result:", result);
-  
+  const { phrase, updated_at } = data;
 
-  // verificar la hora
+  const currentHour = new Date().getHours();
+  const updatedHour = parseInt(updated_at.split(":")[0]);
 
-  // solicitar frase a openai
-  const newCitation = await fetchOpenAIResponse(generateCitation);
+  if (currentHour !== updatedHour) {
+    let newCitation: string;
+    try {
+      newCitation = await fetchOpenAICitation(generateCitation);
+    } catch (err) {
+      // console.error("Error generating citation:", err);
+      return { phrase, updated_at };
+    }
 
-  // actualizar la frase y la hora en supabase
+    const newTime = `${currentHour.toString().padStart(2, "0")}:00:00`;
 
-  return result;
+    const { error: updateError } = await supabase
+      .from("phrase")
+      .update({
+        phrase: newCitation,
+        updated_at: newTime,
+      })
+      .eq("id", 1);
+
+    if (updateError) {
+      throw new Error("Update failed: " + updateError.message);
+    }
+
+    return {
+      phrase: newCitation,
+      updated_at: newTime,
+    };
+  }
+
+  return { phrase, updated_at };
 };
 
 export const createPrayerService = async (answer: string): Promise<any> => {
