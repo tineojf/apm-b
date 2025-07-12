@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import {
-  createPrayerFromAnswer,
-  getRandomBibleCitation,
+  getCitationService,
+  createPrayerService,
 } from "../services/openaiService";
 
 export const citationController = async (_req: Request, res: Response) => {
   try {
-    const citation = await getRandomBibleCitation();
+    const citation = await getCitationService();
     res.json({ citation });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch citation" });
@@ -31,7 +31,7 @@ export const prayerController = async (req: Request, res: Response) => {
   }
 
   try {
-    const prayer = await createPrayerFromAnswer(answer);
+    const prayer = await createPrayerService(answer);
     res.json({ prayer });
   } catch (error) {
     res.status(500).json({ error: "Failed to generate prayer" });
