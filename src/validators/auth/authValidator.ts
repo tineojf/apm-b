@@ -85,7 +85,7 @@ export const updateSchema = z.object({
 
   method: z.enum(["email", "apple"], {
     required_error: "Validator: method is required",
-    invalid_type_error: "Validator: method must be a string",
+    invalid_type_error: "Validator: method must be one of 'email' or 'apple'",
   }),
 });
 
