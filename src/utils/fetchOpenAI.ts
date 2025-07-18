@@ -6,10 +6,15 @@ const client = new OpenAI({
 });
 
 export const fetchOpenAIResponse = async (prompt: string): Promise<string> => {
+  const today = new Date().toISOString().slice(0, 10);
+  const randomSeed = Math.random().toString(36).substring(2, 8);
+
+  const dynamicPrompt = `${prompt}\nToday: ${today}, Seed: ${randomSeed}`;
+
   try {
     const data = await client.responses.create({
       model: "gpt-4o-mini",
-      input: prompt,
+      input: dynamicPrompt,
       max_output_tokens: 150,
     });
 

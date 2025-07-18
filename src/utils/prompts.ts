@@ -6,8 +6,11 @@ export const generatePrayer = (answer: string) => {
   Conclude with a Bible verse that reinforces the message of the prayer.`;
 };
 
-
 export const generateCitation = `Return a random Bible verse in the following format:
   "phrase" - author:verse
-  The verse must be contextually related to the current day. If we are near a significant Christian observance (e.g. Easter, Christmas, Lent, Pentecost), choose a verse that reflects that theme, considering the general Christian calendar (Catholic, Protestant, or Orthodox).
-  Do not repeat a previously used verse. Only return the citation, with no explanations.`;
+  Rules:
+  - Choose a verse relevant to today's date in the Christian calendar (Catholic, Protestant, or Orthodox).
+  - If near a significant observance (Easter, Christmas, Lent, Pentecost), select a verse reflecting that theme.
+  - Ensure the verse is not repeated recently.
+  - You must vary the output randomly to avoid repetition, even if asked the same prompt multiple times.
+  Return only the verse as specified, without explanations.`;
