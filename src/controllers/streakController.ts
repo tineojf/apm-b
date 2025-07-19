@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StreakActivityDTO } from "../validators/dateStringValidator";
 import { getUserStreakByUserId } from "../services/userStreakService";
-import { streakWeekMonthInput } from "../validators/streak/streakOfWeekValidator";
+import { streakTodayInput } from "../validators/streak/streakValidator";
 import {
   extendStreakService,
   getUserStreakInfoService,
@@ -82,7 +82,7 @@ export const getStreakOfWeekController = async (
 ): Promise<any> => {
   try {
     const user = req.user!;
-    const body = req.body as streakWeekMonthInput;
+    const body = req.body as streakTodayInput;
 
     const streakActivity = await getStreakOfWeekService(user.id, body);
 
@@ -110,7 +110,7 @@ export const getStreakOfMonthController = async (
 ): Promise<any> => {
   try {
     const user = req.user!;
-    const body = req.body as streakWeekMonthInput;
+    const body = req.body as streakTodayInput;
 
     const streakActivity = await getStreakOfMonthService(user.id, body);
 

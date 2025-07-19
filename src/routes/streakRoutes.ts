@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/validateJwt";
 import { streakActivitySchema } from "../validators/dateStringValidator";
-import { streakWeekMonthSchema } from "../validators/streak/streakOfWeekValidator";
+import { streakTodaySchema } from "../validators/streak/streakValidator";
 import { validate } from "../middleware/validate";
 import {
   getStreakActivityController,
@@ -20,12 +20,12 @@ streakRoutes.get("/activity", getStreakActivityController);
 streakRoutes.get("/info", getStreakInfoController);
 streakRoutes.get(
   "/weekly-days",
-  validate(streakWeekMonthSchema),
+  validate(streakTodaySchema),
   getStreakOfWeekController
 );
 streakRoutes.get(
   "/monthly-progress",
-  validate(streakWeekMonthSchema),
+  validate(streakTodaySchema),
   getStreakOfMonthController
 );
 

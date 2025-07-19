@@ -3,7 +3,7 @@ import { formatWeekStreak } from "../utils/streak/formatWeekStreak";
 import { type StreakActivity } from "../types/supabase";
 import { createResponse, type GlobalResponse } from "../utils/globalResponse";
 import { getStartOfWeek } from "../utils/streak/dates";
-import { streakWeekMonthInput } from "../validators/streak/streakOfWeekValidator";
+import { streakTodayInput } from "../validators/streak/streakValidator";
 import { parseISO, startOfMonth, format } from "date-fns";
 
 export const createStreakActivityService = async (
@@ -95,7 +95,7 @@ export const getStreakActivityByUserIdAndCompletedAt = async (
 
 export const getStreakOfWeekService = async (
   id: string,
-  body: streakWeekMonthInput
+  body: streakTodayInput
 ): Promise<Record<string, string>> => {
   const todayString = body.today;
 
@@ -117,7 +117,7 @@ export const getStreakOfWeekService = async (
 
 export const getStreakOfMonthService = async (
   id: string,
-  body: streakWeekMonthInput
+  body: streakTodayInput
 ): Promise<number> => {
   const todayString = body.today;
   const today = parseISO(todayString);
