@@ -12,6 +12,7 @@ import {
   getStreakOfWeekService,
   getStreakOfMonthService,
 } from "../services/streakActivityService";
+import { StreakOfWeekInput } from "../validators/streak/streakOfWeekValidator";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
   const streakInfo = await getUserStreakInfoService(req.user!.id);
@@ -81,7 +82,9 @@ export const getStreakOfWeekController = async (
 ): Promise<any> => {
   try {
     const user = req.user!;
-    const streakActivity = await getStreakOfWeekService(user.id);
+    const body = req.body as StreakOfWeekInput;
+
+    const streakActivity = await getStreakOfWeekService(user.id, body);
 
     res.status(200).json({
       ok: true,
