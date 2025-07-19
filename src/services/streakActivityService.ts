@@ -2,8 +2,9 @@ import { supabase } from "../utils/supabaseClient";
 import { formatWeekStreak } from "../utils/streak/formatWeekStreak";
 import { type StreakActivity } from "../types/supabase";
 import { createResponse, type GlobalResponse } from "../utils/globalResponse";
-import { formatDate, getStartOfWeek } from "../utils/streak/dates";
-import { StreakOfWeekInput } from "../validators/streak/streakOfWeekValidator";
+import { getStartOfWeek } from "../utils/streak/dates";
+import { streakWeekMonthInput } from "../validators/streak/streakOfWeekValidator";
+import { parseISO, startOfMonth, format } from "date-fns";
 
 export const createStreakActivityService = async (
   userId: string,
@@ -94,7 +95,7 @@ export const getStreakActivityByUserIdAndCompletedAt = async (
 
 export const getStreakOfWeekService = async (
   id: string,
-  body: StreakOfWeekInput
+  body: streakWeekMonthInput
 ): Promise<Record<string, string>> => {
   const todayString = body.today;
 
@@ -114,5 +115,26 @@ export const getStreakOfWeekService = async (
   return formatWeekStreak(completedDates, todayString);
 };
 
+export const getStreakOfMonthService = async (
+  id: string,
+  body: streakWeekMonthInput
+): Promise<number> => {
+  const todayString = body.today;
+  const today = parseISO(todayString);
 
-export const getStreakOfMonthService = async (id: string) => {};
+  const startOfMonthDate = startOfMonth(today);
+  const startOfMonthString = format(startOfMonthDate, "yyyy-MM-dd");
+
+  const { data, error } = await supabase
+    .from("streak_activity")
+    .select("completed_at")
+    .eq("user_id", id)
+    .gte("completed_at", startOfMonthString)
+    .lte("completed_at", todayString);
+
+  if (error) {
+    throw new Error("DB: " + error.message);
+  }
+
+  return data.length;
+};
