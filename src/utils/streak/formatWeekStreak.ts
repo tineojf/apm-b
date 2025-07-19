@@ -3,7 +3,7 @@ import { parseISO, startOfWeek, addDays, format, getDay } from "date-fns";
 export const formatWeekStreak = (
   completedDates: Set<string>,
   todayString: string
-): Record<string, string> => {
+): Record<string, [string, string]> => {
   const today = parseISO(todayString);
   const dayOfWeek = getDay(today); // 0 = Sunday
   const startOfWeekDate = startOfWeek(today, { weekStartsOn: 0 });
@@ -18,23 +18,27 @@ export const formatWeekStreak = (
     "saturday",
   ];
 
-  const weekStatus: Record<string, string> = {};
+  const weekStatus: Record<string, [string, string]> = {};
 
   for (let i = 0; i < 7; i++) {
     const currentDay = addDays(startOfWeekDate, i);
-    const dateString = format(currentDay, "yyyy-MM-dd");
+    const dateString = format(currentDay, "d");
+
+    let status: string;
 
     if (i < dayOfWeek) {
-      weekStatus[daysOfWeek[i]] = completedDates.has(dateString)
+      status = completedDates.has(format(currentDay, "yyyy-MM-dd"))
         ? "completed"
         : "incompleted";
     } else if (i === dayOfWeek) {
-      weekStatus[daysOfWeek[i]] = completedDates.has(dateString)
+      status = completedDates.has(format(currentDay, "yyyy-MM-dd"))
         ? "completed"
         : "today";
     } else {
-      weekStatus[daysOfWeek[i]] = "not available";
+      status = "not available";
     }
+
+    weekStatus[dateString] = [daysOfWeek[i], status];
   }
 
   return weekStatus;

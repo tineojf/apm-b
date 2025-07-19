@@ -96,7 +96,7 @@ export const getStreakActivityByUserIdAndCompletedAt = async (
 export const getStreakOfWeekService = async (
   id: string,
   body: streakTodayInput
-): Promise<Record<string, string>> => {
+): Promise<Record<string, [string, string]>> => {
   const todayString = body.today;
 
   const { data, error } = await supabase
