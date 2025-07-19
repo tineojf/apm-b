@@ -18,17 +18,17 @@ streakRoutes.use(authenticate);
 
 streakRoutes.get("/activity", getStreakActivityController);
 streakRoutes.get("/info", getStreakInfoController);
-streakRoutes.get(
+
+streakRoutes.post(
   "/weekly-days",
   validate(streakTodaySchema),
   getStreakOfWeekController
 );
-streakRoutes.get(
+streakRoutes.post(
   "/monthly-progress",
   validate(streakTodaySchema),
   getStreakOfMonthController
 );
-
 streakRoutes.post(
   "/update",
   validate(streakActivitySchema),
