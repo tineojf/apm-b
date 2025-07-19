@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/validateJwt";
 import { streakActivitySchema } from "../validators/dateStringValidator";
+import { streakWeekMonthSchema } from "../validators/streak/streakOfWeekValidator";
 import { validate } from "../middleware/validate";
 import {
   getStreakActivityController,
@@ -10,7 +11,6 @@ import {
   updateStreakController,
   getHasPrayedTodayController,
 } from "../controllers/streakController";
-import { streakOfWeekSchema } from "../validators/streak/streakOfWeekValidator";
 
 const streakRoutes = Router();
 
@@ -20,10 +20,14 @@ streakRoutes.get("/activity", getStreakActivityController);
 streakRoutes.get("/info", getStreakInfoController);
 streakRoutes.get(
   "/weekly-days",
-  validate(streakOfWeekSchema),
+  validate(streakWeekMonthSchema),
   getStreakOfWeekController
 );
-streakRoutes.get("/monthly-progress", getStreakOfMonthController);
+streakRoutes.get(
+  "/monthly-progress",
+  validate(streakWeekMonthSchema),
+  getStreakOfMonthController
+);
 
 streakRoutes.post(
   "/update",

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const streakOfWeekSchema = z.object({
+export const streakWeekMonthSchema = z.object({
   today: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
@@ -17,4 +17,4 @@ export const streakOfWeekSchema = z.object({
     ),
 });
 
-export type StreakOfWeekInput = z.infer<typeof streakOfWeekSchema>;
+export type streakWeekMonthInput = z.infer<typeof streakWeekMonthSchema>;
