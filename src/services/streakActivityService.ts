@@ -1,7 +1,9 @@
 import { supabase } from "../utils/supabaseClient";
-
+import { formatWeekStreak } from "../utils/streak/formatWeekStreak";
 import { type StreakActivity } from "../types/supabase";
 import { createResponse, type GlobalResponse } from "../utils/globalResponse";
+import { formatDate, getStartOfWeek } from "../utils/streak/dates";
+import { StreakOfWeekInput } from "../validators/streak/streakOfWeekValidator";
 
 export const createStreakActivityService = async (
   userId: string,
@@ -89,3 +91,28 @@ export const getStreakActivityByUserIdAndCompletedAt = async (
     detail: "Streak activity retrieved successfully",
   });
 };
+
+export const getStreakOfWeekService = async (
+  id: string,
+  body: StreakOfWeekInput
+): Promise<Record<string, string>> => {
+  const todayString = body.today;
+
+  const { data, error } = await supabase
+    .from("streak_activity")
+    .select("completed_at")
+    .eq("user_id", id)
+    .gte("completed_at", getStartOfWeek(todayString))
+    .lte("completed_at", todayString);
+
+  if (error) {
+    throw new Error("DB: " + error.message);
+  }
+
+  const completedDates = new Set(data.map((item) => item.completed_at));
+
+  return formatWeekStreak(completedDates, todayString);
+};
+
+
+export const getStreakOfMonthService = async (id: string) => {};
