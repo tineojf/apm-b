@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
 import { StreakActivityDTO } from "../validators/dateStringValidator";
+import { getUserStreakByUserId } from "../services/userStreakService";
 import {
   extendStreakService,
   getUserStreakInfoService,
   initializeStreak,
 } from "../services/streakService";
-import { getUserStreakByUserId } from "../services/userStreakService";
 import {
   getAllStreakActivityByUserId,
   getStreakActivityByUserIdAndCompletedAt,
+  getStreakOfWeekService,
+  getStreakOfMonthService,
 } from "../services/streakActivityService";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
@@ -71,4 +73,56 @@ export const getHasPrayedTodayController = async (
   );
 
   res.status(streakActivity.statusCode).json(streakActivity);
+};
+
+export const getStreakOfWeekController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const user = req.user!;
+    const streakActivity = await getStreakOfWeekService(user.id);
+
+    res.status(200).json({
+      ok: true,
+      message: "Weekly streak days fetched successfully",
+      data: streakActivity,
+      dateTime: new Date().toISOString(),
+      detail: "Returned weekly streak days",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error fetching weekly streak days",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
+};
+
+export const getStreakOfMonthController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const user = req.user!;
+    const streakActivity = await getStreakOfMonthService(user.id);
+
+    res.status(200).json({
+      ok: true,
+      message: "Monthly streak progress fetched successfully",
+      data: streakActivity,
+      dateTime: new Date().toISOString(),
+      detail: "Returned monthly streak progress",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error fetching monthly streak progress",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
 };
