@@ -10,6 +10,7 @@ import {
   updateStreakController,
   getHasPrayedTodayController,
 } from "../controllers/streakController";
+import { streakOfWeekSchema } from "../validators/streak/streakOfWeekValidator";
 
 const streakRoutes = Router();
 
@@ -17,7 +18,11 @@ streakRoutes.use(authenticate);
 
 streakRoutes.get("/activity", getStreakActivityController);
 streakRoutes.get("/info", getStreakInfoController);
-streakRoutes.get("/weekly-days", getStreakOfWeekController);
+streakRoutes.get(
+  "/weekly-days",
+  validate(streakOfWeekSchema),
+  getStreakOfWeekController
+);
 streakRoutes.get("/monthly-progress", getStreakOfMonthController);
 
 streakRoutes.post(
