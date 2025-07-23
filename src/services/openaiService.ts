@@ -1,4 +1,5 @@
-import { generatePrayer, generateCitation } from "../utils/prompts";
+import { generatePrayer } from "../prompts/dailyPrayerPrompt";
+import { generateCitation } from "../prompts/citationPrompt";
 import { fetchOpenAIResponse } from "../utils/fetchOpenAI";
 import { supabase } from "../utils/supabaseClient";
 
