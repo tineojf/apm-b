@@ -138,3 +138,18 @@ export const getStreakOfMonthService = async (
 
   return data.length;
 };
+
+export const getDaysPracticedService = async (
+  userId: string
+): Promise<number> => {
+  const { data, error } = await supabase
+    .from("streak_activity")
+    .select("completed_at", { count: "exact" })
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error("DB: " + error.message);
+  }
+
+  return data.length;
+};
