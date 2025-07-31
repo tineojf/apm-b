@@ -12,6 +12,7 @@ import {
   getStreakActivityByUserIdAndCompletedAt,
   getStreakOfWeekService,
   getStreakOfMonthService,
+  getDaysPracticedService,
 } from "../services/streakActivityService";
 
 export const getStreakInfoController = async (req: Request, res: Response) => {
@@ -125,6 +126,32 @@ export const getStreakOfMonthController = async (
     res.status(500).json({
       ok: false,
       message: "Error fetching monthly streak progress",
+      data: null,
+      dateTime: new Date().toISOString(),
+      detail: error.message,
+    });
+  }
+};
+
+export const getDaysPracticedController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const user = req.user!;
+    const daysPracticed = await getDaysPracticedService(user.id);
+
+    res.status(200).json({
+      ok: true,
+      message: "Days practiced fetched successfully",
+      data: daysPracticed,
+      dateTime: new Date().toISOString(),
+      detail: "Returned days practiced",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: "Error fetching days practiced",
       data: null,
       dateTime: new Date().toISOString(),
       detail: error.message,

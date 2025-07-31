@@ -10,6 +10,7 @@ import {
   getStreakOfMonthController,
   updateStreakController,
   getHasPrayedTodayController,
+  getDaysPracticedController,
 } from "../controllers/streakController";
 
 const streakRoutes = Router();
@@ -18,6 +19,7 @@ streakRoutes.use(authenticate);
 
 streakRoutes.get("/activity", getStreakActivityController);
 streakRoutes.get("/info", getStreakInfoController);
+streakRoutes.get("/days-practiced", getDaysPracticedController);
 
 streakRoutes.post(
   "/weekly-days",
