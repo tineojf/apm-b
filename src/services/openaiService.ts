@@ -45,10 +45,17 @@ export const getCitationService = async (): Promise<any> => {
       throw new Error("Update failed: " + updateError.message);
     }
 
-    return {
-      phrase: newCitation,
-      updated_at: newTime,
-    };
+    const { error: insertError } = await supabase
+      .from("phrase_history")
+      .insert({
+        phrase: newCitation,
+        updated_at: newTime,
+      })
+      .select();
+
+    if (insertError) {
+      throw new Error("Insert failed: " + insertError.message);
+    }
   }
 
   return { phrase, updated_at };
