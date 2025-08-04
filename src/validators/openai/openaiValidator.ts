@@ -6,6 +6,10 @@ export const prayerSchema = z.object({
     invalid_type_error:
       "Validator: answer must be one of 'bad', 'good', 'neutral', 'bien' or 'mal'",
   }),
+  lang: z.enum(["en", "es"], {
+    required_error: "Validator: lang is required",
+    invalid_type_error: "Validator: lang must be 'en' or 'es'",
+  }),
 });
 
 export type PrayerInput = z.infer<typeof prayerSchema>;
