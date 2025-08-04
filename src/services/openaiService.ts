@@ -2,63 +2,72 @@ import { generatePrayer } from "../prompts/dailyPrayerPrompt";
 import { generateCitation } from "../prompts/citationPrompt";
 import { fetchOpenAIResponse } from "../utils/fetchOpenAI";
 import { supabase } from "../utils/supabaseClient";
+import { generateSpanishPrompt } from "../prompts/citationTranslationPrompt";
 
 export const getCitationService = async (): Promise<any> => {
-  const { data, error } = await supabase
-    .from("phrase")
-    .select("phrase, updated_at")
-    .eq("id", 1)
-    .single();
+  const fetchPhrase = async (id: number) => {
+    const { data, error } = await supabase
+      .from("phrase")
+      .select("phrase, updated_at")
+      .eq("id", id)
+      .single();
 
-  if (error) {
-    throw new Error("DB: " + error.message);
-  }
-  if (!data) {
-    throw new Error("No citation found");
-  }
+    if (error || !data) throw new Error(`DB(id: ${id}): ${error?.message}`);
 
-  const { phrase, updated_at } = data;
+    return data;
+  };
+
+  const updatePhrase = async (
+    id: number,
+    phrase: string,
+    updated_at: string
+  ) => {
+    const { error } = await supabase
+      .from("phrase")
+      .update({ phrase, updated_at })
+      .eq("id", id);
+
+    if (error) throw new Error(`Update failed for id ${id}: ${error.message}`);
+  };
+
+  const enData = await fetchPhrase(1);
+  const esData = await fetchPhrase(2);
 
   const currentHour = new Date().getHours();
-  const updatedHour = parseInt(updated_at.split(":")[0]);
+  const updatedHour = parseInt(enData.updated_at.split(":")[0]);
 
   if (currentHour !== updatedHour) {
-    let newCitation: string;
     try {
-      newCitation = await fetchOpenAIResponse(generateCitation);
-    } catch (err) {
-      // console.error("Error generating citation:", err);
-      return { phrase, updated_at };
-    }
+      const newEN = await fetchOpenAIResponse(generateCitation);
+      const newES = await fetchOpenAIResponse(generateSpanishPrompt(newEN));
 
-    const newTime = `${currentHour.toString().padStart(2, "0")}:00:00`;
+      const newTime = `${currentHour.toString().padStart(2, "0")}:00:00`;
 
-    const { error: updateError } = await supabase
-      .from("phrase")
-      .update({
-        phrase: newCitation,
+      await updatePhrase(1, newEN, newTime);
+      await updatePhrase(2, newES, newTime);
+
+      const { error: insertError } = await supabase
+        .from("phrase_history")
+        .insert({ phrase: newEN, updated_at: newTime });
+      if (insertError) throw new Error("Insert failed: " + insertError.message);
+
+      return {
+        phrase: {
+          en: newEN,
+          es: newES,
+        },
         updated_at: newTime,
-      })
-      .eq("id", 1);
-
-    if (updateError) {
-      throw new Error("Update failed: " + updateError.message);
-    }
-
-    const { error: insertError } = await supabase
-      .from("phrase_history")
-      .insert({
-        phrase: newCitation,
-        updated_at: newTime,
-      })
-      .select();
-
-    if (insertError) {
-      throw new Error("Insert failed: " + insertError.message);
-    }
+      };
+    } catch {}
   }
 
-  return { phrase, updated_at };
+  return {
+    phrase: {
+      en: enData.phrase,
+      es: esData.phrase,
+    },
+    updated_at: enData.updated_at,
+  };
 };
 
 export const createPrayerService = async (
