@@ -61,8 +61,12 @@ export const getCitationService = async (): Promise<any> => {
   return { phrase, updated_at };
 };
 
-export const createPrayerService = async (answer: string): Promise<string> => {
-  const prompt = generatePrayer(answer);
+export const createPrayerService = async (
+  answer: string,
+  lang: string
+): Promise<string> => {
+  const language = lang === "en" ? "english" : "spanish";
+  const prompt = generatePrayer(answer, language);
   const result = await fetchOpenAIResponse(prompt);
   return result;
 };

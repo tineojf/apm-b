@@ -35,7 +35,7 @@ export const prayerController = async (
   try {
     const body = req.body as PrayerInput;
 
-    const prayer = await createPrayerService(body.answer);
+    const prayer = await createPrayerService(body.answer, body.lang);
 
     res.status(200).json({
       ok: true,
