@@ -24,13 +24,13 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/chat", chatRoutes);
-app.use("/api/v1/streak", streakRoutes);
-app.use("/api/v1/profile", profileRoutes);
-app.use("/api/v1/openai", openaiRoutes);
-app.use("/api/v1/bible", bibleRoutes);
-app.use("/api/v1/feedback", feedbackRoutes);
+app.use("/api/v2/auth", authRoutes);
+app.use("/api/v2/chat", chatRoutes);
+app.use("/api/v2/streak", streakRoutes);
+app.use("/api/v2/profile", profileRoutes);
+app.use("/api/v2/openai", openaiRoutes);
+app.use("/api/v2/bible", bibleRoutes);
+app.use("/api/v2/feedback", feedbackRoutes);
 
 // Vercel
 export default app;
