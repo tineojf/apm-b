@@ -20,7 +20,8 @@ app.use(express.json());
 // Routes
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "API is running. Use the endpoints provided in the documentation.",
+    message: "API v2 is running",
+    version: "2.0.0",
   });
 });
 
