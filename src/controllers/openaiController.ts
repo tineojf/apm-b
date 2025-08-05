@@ -15,7 +15,8 @@ export const citationController = async (
     res.status(200).json({
       ok: true,
       message: "Citation fetched successfully",
-      citation: citation.phrase,
+      citation: citation.phrase.en,
+      citationES: citation.phrase.es,
       updatedAt: citation.updated_at,
     });
   } catch (error: any) {
@@ -35,7 +36,7 @@ export const prayerController = async (
   try {
     const body = req.body as PrayerInput;
 
-    const prayer = await createPrayerService(body.answer);
+    const prayer = await createPrayerService(body.answer, body.lang);
 
     res.status(200).json({
       ok: true,

@@ -20,17 +20,18 @@ app.use(express.json());
 // Routes
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "API is running. Use the endpoints provided in the documentation.",
+    message: "API v2 is running",
+    version: "2.0.0",
   });
 });
 
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/chat", chatRoutes);
-app.use("/api/v1/streak", streakRoutes);
-app.use("/api/v1/profile", profileRoutes);
-app.use("/api/v1/openai", openaiRoutes);
-app.use("/api/v1/bible", bibleRoutes);
-app.use("/api/v1/feedback", feedbackRoutes);
+app.use("/api/v2/auth", authRoutes);
+app.use("/api/v2/chat", chatRoutes);
+app.use("/api/v2/streak", streakRoutes);
+app.use("/api/v2/profile", profileRoutes);
+app.use("/api/v2/openai", openaiRoutes);
+app.use("/api/v2/bible", bibleRoutes);
+app.use("/api/v2/feedback", feedbackRoutes);
 
 // Vercel
 export default app;
