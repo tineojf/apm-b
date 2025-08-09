@@ -51,3 +51,11 @@ export interface Update {
   is_premium: boolean;
   created_at?: string;
 }
+
+export interface AiRequestErrors {
+  id: number;
+  created_at: string;
+  request_payload: string;
+  status_code: string;
+  endpoint: string;
+}
