@@ -4,7 +4,8 @@ import { GlobalResponse } from "../models/globalResponseModel";
 
 export const createUserStreakService = async (
   userId: string,
-  createdDate: string
+  createdDate: string,
+  timezone: string
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("user_streaks")
@@ -15,6 +16,7 @@ export const createUserStreakService = async (
       longest_streak: 1,
       remaining_lives: 3,
       last_lives_reset: createdDate,
+      timezone,
     })
     .select()
     .single();
