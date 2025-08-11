@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/validateJwt";
-import { streakActivitySchema } from "../validators/dateStringValidator";
+import {
+  streakActivitySchema,
+  updateStreakSchema,
+} from "../validators/dateStringValidator";
 import { streakTodaySchema } from "../validators/streak/streakValidator";
 import { validate } from "../middleware/validate";
 import {
@@ -33,7 +36,7 @@ streakRoutes.post(
 );
 streakRoutes.post(
   "/update",
-  validate(streakActivitySchema),
+  validate(updateStreakSchema),
   updateStreakController
 );
 streakRoutes.post(
