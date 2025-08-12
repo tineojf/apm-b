@@ -77,3 +77,21 @@ export const updateUserStreak = async (
 
   return data as UserStreak;
 };
+
+export const updateTimezone = async (timezone: string, userId: string) => {
+  const { data, error } = await supabase
+    .from("user_streaks")
+    .update({
+      timezone,
+    })
+    .eq("user_id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    console.log("error in updateTimezone", error);
+    throw "Error updating timezone";
+  }
+
+  return data as UserStreak;
+};
