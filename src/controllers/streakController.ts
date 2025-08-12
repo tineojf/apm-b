@@ -51,6 +51,7 @@ export const updateStreakController = async (req: Request, res: Response) => {
   const resp = await extendStreakService({
     userId: user.id,
     userStreak: userStreak,
+    timezone: timezone,
   });
 
   res.status(resp.statusCode).json(resp);

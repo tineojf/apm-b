@@ -5,12 +5,14 @@ import tz from "dayjs/plugin/timezone";
 import {
   createUserStreakService,
   getUserStreakByUserId,
+  updateTimezone,
   updateUserStreak,
 } from "./userStreakService";
 import { UserStreak } from "../types/supabase";
 import { GlobalResponse } from "../models/globalResponseModel";
 import { createResponse } from "../utils/globalResponse";
 import { createStreakActivityService } from "./streakActivityService";
+import timezone from "dayjs/plugin/timezone";
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -24,9 +26,7 @@ const recalculateStreak = (streak: UserStreak) => {
   const userTZ = streak.timezone || "UTC";
 
   const todayUserTZ = dayjs().tz(userTZ).startOf("day");
-  const lastUpdateUserTZ = dayjs(streak.last_completed_date)
-    .tz(userTZ)
-    .startOf("day");
+  const lastUpdateUserTZ = dayjs(streak.updated_at).tz(userTZ).startOf("day");
 
   const diffDays = todayUserTZ.diff(lastUpdateUserTZ, "day");
 
@@ -45,7 +45,6 @@ const recalculateStreak = (streak: UserStreak) => {
       current_streak,
       longest_streak,
       remaining_lives: lives,
-      last_update: todayUserTZ.format("YYYY-MM-DD"),
       changed: true,
     };
   }
@@ -68,14 +67,11 @@ export const getUserStreakInfoService = async (userId: string) => {
 
     const updatedStreak_ = recalculateStreak(userStreak);
 
-    console.log(updatedStreak_);
-
     if (updatedStreak_.changed) {
       const updatedStreak = await updateUserStreak(userId, {
         current_streak: updatedStreak_.current_streak,
         longest_streak: updatedStreak_.longest_streak,
         remaining_lives: updatedStreak_.remaining_lives,
-        last_completed_date: updatedStreak_.last_update,
       });
       return createResponse({
         message: "User streak updated",
@@ -102,19 +98,23 @@ export const getUserStreakInfoService = async (userId: string) => {
 export const extendStreakService = async ({
   userId,
   userStreak,
+  timezone,
 }: {
   userId: string;
   userStreak: UserStreak;
+  timezone: string;
 }) => {
   try {
+    if (!userStreak.timezone) {
+      await updateTimezone(timezone, userId);
+    }
+
     const userTZ = userStreak.timezone || "UTC";
     const todayUserTZ = dayjs().tz(userTZ).startOf("day");
+
     const lastUpdateUserTZ = dayjs(userStreak.last_completed_date)
       .tz(userTZ)
       .startOf("day");
-
-    let { current_streak, longest_streak, remaining_lives, last_update } =
-      recalculateStreak(userStreak);
 
     if (todayUserTZ.diff(lastUpdateUserTZ, "day") === 0) {
       return createResponse({
@@ -125,24 +125,17 @@ export const extendStreakService = async ({
       });
     }
 
-    if (remaining_lives > 0) {
-      current_streak += 1;
-      if (current_streak > longest_streak) {
-        longest_streak = current_streak;
-      }
-      last_update = todayUserTZ.format("YYYY-MM-DD");
-    }
+    const newCurrentStreak = userStreak.current_streak + 1;
 
     const updatedStreak = await updateUserStreak(userId, {
-      current_streak,
-      longest_streak,
-      last_completed_date: last_update,
-      remaining_lives,
+      current_streak: newCurrentStreak,
+      longest_streak: Math.max(userStreak.longest_streak, newCurrentStreak),
+      last_completed_date: todayUserTZ.format("YYYY-MM-DD"),
     });
 
     const userActivity = await createStreakActivityService(
       userId,
-      last_update!
+      todayUserTZ.format("YYYY-MM-DD")
     );
 
     if (!userActivity.ok) throw new Error("User activity creation failed");
