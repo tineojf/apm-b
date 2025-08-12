@@ -38,7 +38,7 @@ const recalculateStreak = (streak: UserStreak) => {
     if (lives <= 0) {
       // Reinicia racha
       current_streak = 0;
-      lives = 3;
+      lives = 0;
     }
 
     return {
@@ -131,6 +131,8 @@ export const extendStreakService = async ({
       current_streak: newCurrentStreak,
       longest_streak: Math.max(userStreak.longest_streak, newCurrentStreak),
       last_completed_date: todayUserTZ.format("YYYY-MM-DD"),
+      remaining_lives:
+        userStreak.remaining_lives === 0 ? 3 : userStreak.remaining_lives,
     });
 
     const userActivity = await createStreakActivityService(
