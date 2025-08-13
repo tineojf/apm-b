@@ -1,11 +1,11 @@
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 
-export const getFriendByFullNameService = async (fullName: string) => {
+export const getFriendByFullNameOrUsernameService = async (name: string) => {
   const { data, error } = await supabase
     .from("profile")
     .select("*")
-    .ilike("full_name", `%${fullName}%`);
+    .or(`full_name.ilike.%${name}%,username.ilike.%${name}%`);
 
   if (error) {
     throw new Error("DB: " + error.message);

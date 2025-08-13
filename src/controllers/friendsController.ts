@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
-import { getFriendByFullNameService } from "../services/friends.service";
+import { getFriendByFullNameOrUsernameService } from "../services/friends.service";
 
 export const getFriendByFullNameController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { fullName = "" } = req.query;
+    const { name = "" } = req.query;
 
-    if (!fullName) {
+    if (!name) {
       res.status(400).json({ error: "El fullName es obligatorio" });
       return;
     }
 
-    const friends = await getFriendByFullNameService(`${fullName}`);
+    const friends = await getFriendByFullNameOrUsernameService(`${name}`);
 
     res.status(200).json({ friends });
   } catch (error) {
