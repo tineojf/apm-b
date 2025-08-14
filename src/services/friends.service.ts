@@ -1,5 +1,11 @@
+import { Status } from "../types/status.enum";
 import { Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
+import {
+  createFriendsRequestService,
+  getFriendRequestByIdService,
+  updateStatusFriendRequestService,
+} from "./friend_request.service";
 import { getProfileService } from "./profileService";
 
 export const getFriendByFullNameOrUsernameService = async (name: string) => {
@@ -81,4 +87,46 @@ const getFriendRequest = async (senderId: string, receiverId: string) => {
   if (error) throw new Error("DB getFriendRequest: " + error.message);
 
   return existingRequest;
+};
+
+export const processFriendRequestService = async ({
+  id_friend_request,
+  status,
+  user_id,
+}: {
+  id_friend_request: string;
+  status: Status.ACCEPTED | Status.REJECTED;
+  user_id: string;
+}) => {
+  // 1. Verificar si existe una solicitud pendiente
+  const friendRequest = await getFriendRequestByIdService(id_friend_request);
+
+  // 2. Verificar si el usuario es el receptor
+  if (friendRequest.receiver_id !== user_id)
+    throw new Error("You are not the receiver of this friend request");
+
+  // 3. Validar el estado de la solicitud
+  if (
+    friendRequest.status !== Status.PENDING ||
+    friendRequest.accepted_at !== null ||
+    friendRequest.rejected_at !== null
+  )
+    throw new Error("This friend request is already accepted or rejected");
+
+  // 4. Actualizar el estado de la solicitud
+  const updatedFriendRequest = await updateStatusFriendRequestService(
+    id_friend_request,
+    status
+  );
+
+  // 5. Crear registro de amistad
+  const friends = await createFriendsRequestService(
+    updatedFriendRequest.sender_id,
+    updatedFriendRequest.receiver_id
+  );
+
+  return {
+    message: "Friend request processed successfully",
+    data: friends,
+  };
 };

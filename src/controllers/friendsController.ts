@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   createFriendRequestService,
   getFriendByFullNameOrUsernameService,
+  processFriendRequestService,
 } from "../services/friends.service";
 
 export const getFriendByFullNameController = async (
@@ -51,6 +52,32 @@ export const sendRequestFriendshipController = async (
     res.status(500).json({
       ok: false,
       message: error.message || "Error fetching sendRequestFriendship",
+    });
+  }
+};
+
+export const updateStatusFriendController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const user = req.user;
+    if (!user) throw new Error("User not authenticated");
+
+    processFriendRequestService({
+      id_friend_request: req.body.id_friend_request,
+      status: req.body.status,
+      user_id: user.id,
+    });
+
+    res.status(200).json({
+      ok: true,
+      message: "Friend request accepted",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      message: error.message || "Error fetching acceptFriendship",
     });
   }
 };
