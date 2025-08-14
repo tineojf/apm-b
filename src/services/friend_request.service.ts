@@ -1,0 +1,54 @@
+import { Status } from "../types/status.enum";
+import { FriendRequest } from "../types/supabase";
+import { supabase } from "../utils/supabaseClient";
+
+export const getFriendRequestByIdService = async (id: string) => {
+  const { data, error } = await supabase
+    .from("friend_requests")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error("DB: " + error.message);
+
+  return data as FriendRequest;
+};
+
+export const updateStatusFriendRequestService = async (
+  id_friend_request: string,
+  status: Status.ACCEPTED | Status.REJECTED
+) => {
+  const { data, error } = await supabase
+    .from("friend_requests")
+    .update({
+      status,
+      rejected_at: status === Status.REJECTED ? new Date().toISOString() : null,
+      accepted_at: status === Status.ACCEPTED ? new Date().toISOString() : null,
+    })
+    .eq("id", id_friend_request)
+    .select("*")
+    .single();
+
+  if (error)
+    throw new Error("DB updateStatusFriendRequestService: " + error.message);
+
+  return data as FriendRequest;
+};
+
+export const createFriendsRequestService = async (
+  senderId: string,
+  receiverId: string
+) => {
+  const { data, error } = await supabase
+    .from("friends")
+    .insert([
+      { user_id: senderId, friend_id: receiverId },
+      { user_id: receiverId, friend_id: senderId },
+    ])
+    .select("*");
+
+  if (error)
+    throw new Error("DB createFriendsRequestService: " + error.message);
+
+  return data as FriendRequest[];
+};
