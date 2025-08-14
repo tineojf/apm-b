@@ -8,6 +8,7 @@ import {
 import { authenticate } from "../middleware/validateJwt";
 import { validate } from "../middleware/validate";
 import { processRequestFriendSchema } from "../validators/friend/processRequestFriendValidator";
+import { createRequestFriendSchema } from "../validators/friend/createRequestFrienValidator";
 
 const friendsRoutes = Router();
 
@@ -15,7 +16,11 @@ friendsRoutes.use(authenticate);
 
 friendsRoutes.get("/search", getFriendByFullNameController);
 
-friendsRoutes.post("/request", sendRequestFriendshipController);
+friendsRoutes.post(
+  "/request",
+  validate(createRequestFriendSchema),
+  sendRequestFriendshipController
+);
 
 friendsRoutes.get("/request", getPendingFriendRequestController);
 

@@ -5,6 +5,7 @@ import {
   processFriendRequestService,
 } from "../services/friends.service";
 import { getPendingFriendRequestByReceiverIdService } from "../services/friend_request.service";
+import { CreateRequestFriendDTO } from "../validators/friend/createRequestFrienValidator";
 
 export const getFriendByFullNameController = async (
   req: Request,
@@ -37,16 +38,11 @@ export const sendRequestFriendshipController = async (
 ) => {
   try {
     const user = req.user;
+    const { profileId } = req.body as CreateRequestFriendDTO;
 
     if (!user) throw new Error("User not authenticated");
 
-    if (!req.body.friendId)
-      throw new Error("friendId is required in the request body");
-
-    const friends = await createFriendRequestService(
-      user.id,
-      req.body.friendId
-    );
+    const friends = await createFriendRequestService(user.id, profileId);
 
     res.status(200).json({ friends });
   } catch (error: any) {
