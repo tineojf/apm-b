@@ -14,6 +14,22 @@ export const getFriendRequestByIdService = async (id: string) => {
   return data as FriendRequest;
 };
 
+export const getPendingFriendRequestByReceiverIdService = async (
+  userId: string
+) => {
+  const { data } = await supabase
+    .from("friend_requests")
+    .select(
+      "id, sender_id, receiver_id, created_at, status, sender:friend_requests_sender_id_fkey (username, full_name)"
+    )
+    .eq("receiver_id", userId)
+    .eq("status", Status.PENDING)
+    .order("created_at", { ascending: false })
+    .throwOnError();
+
+  return data;
+};
+
 export const updateStatusFriendRequestService = async (
   id_friend_request: string,
   status: Status.ACCEPTED | Status.REJECTED

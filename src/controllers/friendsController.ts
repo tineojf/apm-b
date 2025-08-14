@@ -4,6 +4,7 @@ import {
   getFriendByFullNameOrUsernameService,
   processFriendRequestService,
 } from "../services/friends.service";
+import { getPendingFriendRequestByReceiverIdService } from "../services/friend_request.service";
 
 export const getFriendByFullNameController = async (
   req: Request,
@@ -78,6 +79,27 @@ export const updateStatusFriendController = async (
     res.status(500).json({
       ok: false,
       message: error.message || "Error fetching acceptFriendship",
+    });
+  }
+};
+
+export const getPendingFriendRequestController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const pendingFriendRequests =
+      await getPendingFriendRequestByReceiverIdService(req.user!.id);
+
+    return res.status(200).json({
+      ok: true,
+      message: "Pending friend requests fetched successfully",
+      data: pendingFriendRequests,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      ok: false,
+      message: error.message || "Error fetching pending friend requests",
     });
   }
 };

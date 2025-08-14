@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getFriendByFullNameController,
+  getPendingFriendRequestController,
   sendRequestFriendshipController,
   updateStatusFriendController,
 } from "../controllers/friendsController";
@@ -15,6 +16,8 @@ friendsRoutes.use(authenticate);
 friendsRoutes.get("/search", getFriendByFullNameController);
 
 friendsRoutes.post("/request", sendRequestFriendshipController);
+
+friendsRoutes.get("/request", getPendingFriendRequestController);
 
 friendsRoutes.post(
   "/request/process",
