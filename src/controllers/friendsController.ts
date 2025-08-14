@@ -14,7 +14,7 @@ export const getFriendByFullNameController = async (
     const { name = "" } = req.query;
 
     if (!name) {
-      res.status(400).json({ error: "El fullName es obligatorio" });
+      res.status(400).json({ error: "query param name is required" });
       return;
     }
 
