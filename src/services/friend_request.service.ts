@@ -43,7 +43,7 @@ export const updateStatusFriendRequestService = async (
     })
     .eq("id", id_friend_request)
     .select("*")
-    .single();
+    .maybeSingle();
 
   if (error)
     throw new Error("DB updateStatusFriendRequestService: " + error.message);
