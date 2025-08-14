@@ -33,7 +33,7 @@ app.use("/api/v2/profile", profileRoutes);
 app.use("/api/v2/openai", openaiRoutes);
 app.use("/api/v2/bible", bibleRoutes);
 app.use("/api/v2/feedback", feedbackRoutes);
-app.use("/api/v1/friends", friendsRoutes);
+app.use("/api/v2/friends", friendsRoutes);
 
 // Vercel
 export default app;
