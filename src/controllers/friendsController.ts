@@ -65,7 +65,7 @@ export const updateStatusFriendController = async (
     const user = req.user;
     if (!user) throw new Error("User not authenticated");
 
-    processFriendRequestService({
+    const friendRequest = await processFriendRequestService({
       id_friend_request: req.body.id_friend_request,
       status: req.body.status,
       user_id: user.id,
@@ -74,6 +74,7 @@ export const updateStatusFriendController = async (
     res.status(200).json({
       ok: true,
       message: "Friend request accepted",
+      data: friendRequest,
     });
   } catch (error: any) {
     res.status(500).json({
