@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getAllFriendsController,
   getFriendByFullNameController,
   getPendingFriendRequestController,
   sendRequestFriendshipController,
@@ -13,6 +14,8 @@ import { createRequestFriendSchema } from "../validators/friend/createRequestFri
 const friendsRoutes = Router();
 
 friendsRoutes.use(authenticate);
+
+friendsRoutes.get("/", getAllFriendsController);
 
 friendsRoutes.get("/search", getFriendByFullNameController);
 

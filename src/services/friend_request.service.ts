@@ -1,5 +1,5 @@
 import { Status } from "../types/status.enum";
-import { FriendRequest } from "../types/supabase";
+import { Friend, FriendRequest } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 
 export const getFriendRequestByIdService = async (id: string) => {
@@ -67,4 +67,14 @@ export const createFriendsRequestService = async (
     throw new Error("DB createFriendsRequestService: " + error.message);
 
   return data as FriendRequest[];
+};
+
+export const getAllFriendsService = async (userId: string) => {
+  const { data } = await supabase
+    .from("friends")
+    .select("friend_id, friend:friends_friend_id_fkey (username, full_name)")
+    .eq("user_id", userId)
+    .throwOnError();
+
+  return data;
 };

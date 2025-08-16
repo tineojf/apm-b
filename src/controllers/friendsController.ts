@@ -4,7 +4,10 @@ import {
   getFriendByFullNameOrUsernameService,
   processFriendRequestService,
 } from "../services/friends.service";
-import { getPendingFriendRequestByReceiverIdService } from "../services/friend_request.service";
+import {
+  getAllFriendsService,
+  getPendingFriendRequestByReceiverIdService,
+} from "../services/friend_request.service";
 import { CreateRequestFriendDTO } from "../validators/friend/createRequestFrienValidator";
 
 export const getFriendByFullNameController = async (
@@ -22,6 +25,23 @@ export const getFriendByFullNameController = async (
     const friends = await getFriendByFullNameOrUsernameService(`${name}`);
 
     res.status(200).json({ friends });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Error fetching citation",
+      citation: null,
+      updatedAt: null,
+    });
+  }
+};
+
+export const getAllFriendsController = async (req: Request, res: Response) => {
+  try {
+    const friends = await getAllFriendsService(req.user!.id);
+
+    res.status(200).json({
+      friends,
+    });
   } catch (error) {
     res.status(500).json({
       ok: false,
