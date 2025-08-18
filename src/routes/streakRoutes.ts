@@ -36,7 +36,7 @@ streakRoutes.post(
 );
 streakRoutes.post(
   "/update",
-  validate(updateStreakSchema),
+  // validate(updateStreakSchema),
   updateStreakController
 );
 streakRoutes.post(

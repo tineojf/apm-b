@@ -5,7 +5,7 @@ import { GlobalResponse } from "../models/globalResponseModel";
 export const createUserStreakService = async (
   userId: string,
   createdDate: string,
-  timezone: string
+  timezone: string | null
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("user_streaks")

@@ -98,14 +98,16 @@ export const getUserStreakInfoService = async (userId: string) => {
 export const extendStreakService = async ({
   userId,
   userStreak,
-  timezone,
+  timezone: timezone_,
 }: {
   userId: string;
   userStreak: UserStreak;
-  timezone: string;
+  timezone: string | undefined;
 }) => {
   try {
-    if (!userStreak.timezone) {
+    const timezone = timezone_ || "UTC";
+
+    if (!userStreak.timezone && timezone_ !== undefined) {
       await updateTimezone(timezone, userId);
     }
 
@@ -162,17 +164,17 @@ export const extendStreakService = async ({
 
 export const initializeStreak = async (
   userId: string,
-  timezone: string
+  timezone_: string | undefined
 ): Promise<GlobalResponse> => {
   try {
-    const today = dayjs()
-      .tz(timezone || "UTC")
-      .format("YYYY-MM-DD");
+    const timezone = timezone_ || "UTC";
+
+    const today = dayjs().tz(timezone).format("YYYY-MM-DD");
 
     const newUserStreak = await createUserStreakService(
       userId,
       today,
-      timezone
+      timezone === "UTC" ? null : timezone
     );
 
     if (!newUserStreak.ok) throw new Error("User streak creation failed");
