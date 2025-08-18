@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { StreakActivityDTO } from "../validators/dateStringValidator";
+import {
+  StreakActivityDTO,
+  UpdateStreakDTO,
+} from "../validators/dateStringValidator";
 import { getUserStreakByUserId } from "../services/userStreakService";
 import { streakTodayInput } from "../validators/streak/streakValidator";
 import {
@@ -23,32 +26,32 @@ export const getStreakInfoController = async (req: Request, res: Response) => {
 
 export const updateStreakController = async (req: Request, res: Response) => {
   const user = req.user!;
-  const { completedAt } = req.body as StreakActivityDTO;
+  const { timezone } = req.body as UpdateStreakDTO;
 
   const userStreak = await getUserStreakByUserId(user.id);
 
   // If user streak is not found, create a new user streak and streak activity
   if (!userStreak) {
-    const resp = await initializeStreak(user.id, completedAt);
+    const resp = await initializeStreak(user.id, timezone);
     res.status(resp.ok ? 200 : 409).json(resp);
     return;
   }
 
   // If user has prayed today, return the response
-  const prayedToday = await getStreakActivityByUserIdAndCompletedAt(
-    user.id,
-    completedAt
-  );
+  // const prayedToday = await getStreakActivityByUserIdAndCompletedAt(
+  //   user.id,
+  //   completedAt
+  // );
 
-  if (prayedToday.data) {
-    res.status(403).json({ message: "User completed today's streak" });
-    return;
-  }
+  // if (prayedToday.data) {
+  //   res.status(403).json({ message: "User completed today's streak" });
+  //   return;
+  // }
 
   const resp = await extendStreakService({
     userId: user.id,
     userStreak: userStreak,
-    completedAt: completedAt,
+    timezone: timezone,
   });
 
   res.status(resp.statusCode).json(resp);

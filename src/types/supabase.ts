@@ -8,6 +8,7 @@ export interface UserStreak {
   updated_at: string;
   remaining_lives: number;
   last_lives_reset: string;
+  timezone: string | null;
 }
 
 export interface StreakActivity {
