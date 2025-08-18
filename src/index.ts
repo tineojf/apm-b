@@ -9,6 +9,7 @@ import openaiRoutes from "./routes/openaiRoutes";
 import bibleRoutes from "./routes/bibleRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
 import aiRequestErrorsRoutes from "./routes/ai_request_errors.route";
+import appLogRoutes from "./routes/appLogRoutes";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/api/v2/openai", openaiRoutes);
 app.use("/api/v2/bible", bibleRoutes);
 app.use("/api/v2/feedback", feedbackRoutes);
 app.use("/api/v2/ai-request-errors", aiRequestErrorsRoutes);
+app.use("/api/v2/app-log-starts", appLogRoutes);
 
 // Vercel
 export default app;

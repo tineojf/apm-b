@@ -60,3 +60,10 @@ export interface AiRequestErrors {
   status_code: string;
   endpoint: string;
 }
+
+export interface AppLogStarts {
+  app_version: string;
+  user: string;
+  device: string;
+  superwall: string;
+}
