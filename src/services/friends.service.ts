@@ -128,6 +128,12 @@ export const processFriendRequestService = async ({
     status
   );
 
+  if (updatedFriendRequest.status === Status.REJECTED)
+    return {
+      message: "Friend request rejected",
+      data: updatedFriendRequest,
+    };
+
   // 5. Crear registro de amistad
   const friends = await createFriendsRequestService(
     updatedFriendRequest.sender_id,
