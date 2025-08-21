@@ -8,6 +8,7 @@ import {
 import { getPendingFriendRequestByReceiverIdService } from "../services/friend_request.service";
 import { CreateRequestFriendDTO } from "../validators/friend/createRequestFrienValidator";
 import { createResponse } from "../utils/globalResponse";
+import { ProcessRequestFriendDTO } from "../validators/friend/processRequestFriendValidator";
 
 export const getFriendByFullNameController = async (
   req: Request,
@@ -86,14 +87,18 @@ export const updateStatusFriendController = async (
     const user = req.user;
     if (!user) throw new Error("User not authenticated");
 
+    const { id_friend_request, status } = req.body as ProcessRequestFriendDTO;
+
     const friendRequest = await processFriendRequestService({
-      id_friend_request: req.body.id_friend_request,
-      status: req.body.status,
+      id_friend_request,
+      status,
       user_id: user.id,
     });
 
     res.status(200).json(createResponse({ data: friendRequest }));
   } catch (error: any) {
+    console.log("error updateStatusFriendController->", error);
+
     res.status(500).json(
       createResponse({
         message: "Error updating friend request",
