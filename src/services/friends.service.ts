@@ -1,5 +1,5 @@
 import { Status } from "../types/status.enum";
-import { Profile } from "../types/supabase";
+import { FriendWithStreak, Profile } from "../types/supabase";
 import { supabase } from "../utils/supabaseClient";
 import {
   createFriendsRequestService,
@@ -19,6 +19,20 @@ export const getFriendByFullNameOrUsernameService = async (name: string) => {
   }
 
   return data as Profile[];
+};
+
+export const getAllFriendsWithStreakService = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("friends_with_streaks")
+    .select("*")
+    .eq("user_id", userId)
+    .order("current_streak", { ascending: false });
+
+  if (error) {
+    throw new Error("DB getAllFriendWithStreakService: " + error.message);
+  }
+
+  return data as FriendWithStreak[];
 };
 
 export const createFriendRequestService = async (

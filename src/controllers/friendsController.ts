@@ -1,13 +1,11 @@
 import { Request, Response } from "express";
 import {
   createFriendRequestService,
+  getAllFriendsWithStreakService,
   getFriendByFullNameOrUsernameService,
   processFriendRequestService,
 } from "../services/friends.service";
-import {
-  getAllFriendsService,
-  getPendingFriendRequestByReceiverIdService,
-} from "../services/friend_request.service";
+import { getPendingFriendRequestByReceiverIdService } from "../services/friend_request.service";
 import { CreateRequestFriendDTO } from "../validators/friend/createRequestFrienValidator";
 
 export const getFriendByFullNameController = async (
@@ -37,7 +35,7 @@ export const getFriendByFullNameController = async (
 
 export const getAllFriendsController = async (req: Request, res: Response) => {
   try {
-    const friends = await getAllFriendsService(req.user!.id);
+    const friends = await getAllFriendsWithStreakService(req.user!.id);
 
     res.status(200).json({
       friends,

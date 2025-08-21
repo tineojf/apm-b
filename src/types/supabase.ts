@@ -69,3 +69,14 @@ export interface Friend {
   friend_id: string;
   created_at: string;
 }
+
+export interface FriendWithStreak {
+  user_id: string;
+  friend_id: string;
+  username: string;
+  full_name: string;
+  current_streak: number;
+  longest_streak: number;
+  remaining_lives: number;
+  updated_at: Date | null;
+}
