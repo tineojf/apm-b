@@ -60,19 +60,14 @@ export const createFriendRequestService = async (
   // return existingRequest;
 
   // 5. Insertar nueva solicitud
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("friend_requests")
-    .insert({ sender_id: senderId, receiver_id: receiverId });
+    .insert({ sender_id: senderId, receiver_id: receiverId })
+    .select("*");
 
   if (error) throw new Error("DB: " + error.message);
 
-  return {
-    ok: true,
-    message: "Friend request created successfully",
-    data: null,
-    dateTime: new Date().toISOString(),
-    detail: "Friend request created successfully",
-  };
+  return data;
 };
 
 const getRelationFriends = async (userId: string, friendId: string) => {

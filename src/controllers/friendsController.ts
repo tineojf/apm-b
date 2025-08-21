@@ -7,6 +7,7 @@ import {
 } from "../services/friends.service";
 import { getPendingFriendRequestByReceiverIdService } from "../services/friend_request.service";
 import { CreateRequestFriendDTO } from "../validators/friend/createRequestFrienValidator";
+import { createResponse } from "../utils/globalResponse";
 
 export const getFriendByFullNameController = async (
   req: Request,
@@ -22,14 +23,16 @@ export const getFriendByFullNameController = async (
 
     const friends = await getFriendByFullNameOrUsernameService(`${name}`);
 
-    res.status(200).json({ friends });
+    res.status(200).json(createResponse({ data: friends }));
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error fetching citation",
-      citation: null,
-      updatedAt: null,
-    });
+    res.status(500).json(
+      createResponse({
+        message: "Error fetching friends",
+        data: null,
+        statusCode: 500,
+        detail: error instanceof Error ? error.message : "Unknown error",
+      })
+    );
   }
 };
 
@@ -37,16 +40,16 @@ export const getAllFriendsController = async (req: Request, res: Response) => {
   try {
     const friends = await getAllFriendsWithStreakService(req.user!.id);
 
-    res.status(200).json({
-      friends,
-    });
+    res.status(200).json(createResponse({ data: friends }));
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error fetching citation",
-      citation: null,
-      updatedAt: null,
-    });
+    res.status(500).json(
+      createResponse({
+        message: "Error fetching friends",
+        data: null,
+        statusCode: 500,
+        detail: error instanceof Error ? error.message : "Unknown error",
+      })
+    );
   }
 };
 
@@ -62,12 +65,16 @@ export const sendRequestFriendshipController = async (
 
     const friends = await createFriendRequestService(user.id, profileId);
 
-    res.status(200).json({ friends });
+    res.status(200).json(createResponse({ data: friends }));
   } catch (error: any) {
-    res.status(500).json({
-      ok: false,
-      message: error.message || "Error fetching sendRequestFriendship",
-    });
+    res.status(500).json(
+      createResponse({
+        message: "Error sending friend request",
+        data: null,
+        statusCode: 500,
+        detail: error instanceof Error ? error.message : "Unknown error",
+      })
+    );
   }
 };
 
@@ -85,16 +92,16 @@ export const updateStatusFriendController = async (
       user_id: user.id,
     });
 
-    res.status(200).json({
-      ok: true,
-      message: "Friend request accepted",
-      data: friendRequest,
-    });
+    res.status(200).json(createResponse({ data: friendRequest }));
   } catch (error: any) {
-    res.status(500).json({
-      ok: false,
-      message: error.message || "Error fetching acceptFriendship",
-    });
+    res.status(500).json(
+      createResponse({
+        message: "Error updating friend request",
+        data: null,
+        statusCode: 500,
+        detail: error instanceof Error ? error.message : "Unknown error",
+      })
+    );
   }
 };
 
@@ -106,15 +113,17 @@ export const getPendingFriendRequestController = async (
     const pendingFriendRequests =
       await getPendingFriendRequestByReceiverIdService(req.user!.id);
 
-    return res.status(200).json({
-      ok: true,
-      message: "Pending friend requests fetched successfully",
-      data: pendingFriendRequests,
-    });
+    return res
+      .status(200)
+      .json(createResponse({ data: pendingFriendRequests }));
   } catch (error: any) {
-    return res.status(500).json({
-      ok: false,
-      message: error.message || "Error fetching pending friend requests",
-    });
+    return res.status(500).json(
+      createResponse({
+        message: "Error fetching pending friend requests",
+        data: null,
+        statusCode: 500,
+        detail: error instanceof Error ? error.message : "Unknown error",
+      })
+    );
   }
 };
