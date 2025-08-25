@@ -1,3 +1,5 @@
+import { Status } from "./status.enum";
+
 export interface UserStreak {
   id: string;
   user_id: string;
@@ -66,4 +68,31 @@ export interface AppLogStarts {
   user: string;
   device: string;
   superwall: string;
+}
+
+export interface FriendRequest {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  status: Status;
+  created_at: string;
+  rejected_at: string | null;
+  accepted_at: string | null;
+}
+
+export interface Friend {
+  user_id: string;
+  friend_id: string;
+  created_at: string;
+}
+
+export interface FriendWithStreak {
+  user_id: string;
+  friend_id: string;
+  username: string;
+  full_name: string;
+  current_streak: number;
+  longest_streak: number;
+  remaining_lives: number;
+  updated_at: Date | null;
 }
