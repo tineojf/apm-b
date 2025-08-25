@@ -10,6 +10,7 @@ export interface UserStreak {
   updated_at: string;
   remaining_lives: number;
   last_lives_reset: string;
+  timezone: string | null;
 }
 
 export interface StreakActivity {
@@ -52,6 +53,21 @@ export interface Update {
   full_name: string;
   is_premium: boolean;
   created_at?: string;
+}
+
+export interface AiRequestErrors {
+  id: number;
+  created_at: string;
+  request_payload: string;
+  status_code: string;
+  endpoint: string;
+}
+
+export interface AppLogStarts {
+  app_version: string;
+  user: string;
+  device: string;
+  superwall: string;
 }
 
 export interface FriendRequest {

@@ -4,7 +4,8 @@ import { GlobalResponse } from "../models/globalResponseModel";
 
 export const createUserStreakService = async (
   userId: string,
-  createdDate: string
+  createdDate: string,
+  timezone: string | null
 ): Promise<GlobalResponse> => {
   const { data, error } = await supabase
     .from("user_streaks")
@@ -15,6 +16,7 @@ export const createUserStreakService = async (
       longest_streak: 1,
       remaining_lives: 3,
       last_lives_reset: createdDate,
+      timezone,
     })
     .select()
     .single();
@@ -71,6 +73,24 @@ export const updateUserStreak = async (
   if (error) {
     console.log("error in updateUserStreak", error);
     throw error;
+  }
+
+  return data as UserStreak;
+};
+
+export const updateTimezone = async (timezone: string, userId: string) => {
+  const { data, error } = await supabase
+    .from("user_streaks")
+    .update({
+      timezone,
+    })
+    .eq("user_id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    console.log("error in updateTimezone", error);
+    throw "Error updating timezone";
   }
 
   return data as UserStreak;

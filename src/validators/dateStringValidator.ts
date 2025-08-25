@@ -7,3 +7,11 @@ export const streakActivitySchema = z.object({
 });
 
 export type StreakActivityDTO = z.infer<typeof streakActivitySchema>;
+
+export const updateStreakSchema = z.object({
+  timezone: z.string().regex(/^[A-Za-z]+\/[A-Za-z_]+(?:\/[A-Za-z_]+)*$/, {
+    message: "Formato de zona horaria inválido",
+  }),
+});
+
+export type UpdateStreakDTO = z.infer<typeof updateStreakSchema>;
