@@ -15,7 +15,7 @@ interface GlobalResponseProp<T> {
 }
 
 export const createResponse = <T>({
-  message = "",
+  message = "Operation successful",
   data = {} as T,
   detail = "",
   statusCode = 200,

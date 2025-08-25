@@ -6,7 +6,7 @@ import { ProfileInput } from "../validators/profile/profileValidator";
 export const getProfileService = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
     .from("profile")
-    .select("id, full_name, is_premium, created_at")
+    .select("*")
     .eq("id", userId);
 
   if (error) {

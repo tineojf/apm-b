@@ -8,6 +8,7 @@ import profileRoutes from "./routes/profileRoutes";
 import openaiRoutes from "./routes/openaiRoutes";
 import bibleRoutes from "./routes/bibleRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
+import friendsRoutes from "./routes/friends.route";
 import aiRequestErrorsRoutes from "./routes/ai_request_errors.route";
 import appLogRoutes from "./routes/appLogRoutes";
 
@@ -36,13 +37,14 @@ app.use("/api/v2/bible", bibleRoutes);
 app.use("/api/v2/feedback", feedbackRoutes);
 app.use("/api/v2/ai-request-errors", aiRequestErrorsRoutes);
 app.use("/api/v2/app-log-starts", appLogRoutes);
+app.use("/api/v2/friends", friendsRoutes);
 
 // Vercel
 export default app;
 
 // Local server
-// const PORT = Number(process.env.PORT) || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
-// app.listen(PORT, "0.0.0.0", () => {
-//   console.log(`Server running on port http://localhost:${process.env.PORT}`);
-// });
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port http://localhost:${process.env.PORT}`);
+});
