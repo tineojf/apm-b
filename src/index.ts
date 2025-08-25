@@ -43,8 +43,8 @@ app.use("/api/v2/friends", friendsRoutes);
 export default app;
 
 // Local server
-const PORT = Number(process.env.PORT) || 5000;
+//const PORT = Number(process.env.PORT) || 5000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port http://localhost:${process.env.PORT}`);
-});
+//app.listen(PORT, "0.0.0.0", () => {
+  //console.log(`Server running on port http://localhost:${process.env.PORT}`);
+//});
