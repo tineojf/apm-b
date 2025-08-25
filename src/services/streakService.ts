@@ -30,21 +30,23 @@ const recalculateStreak = (streak: UserStreak) => {
 
   const diffDays = todayUserTZ.diff(lastUpdateUserTZ, "day");
 
-  let { current_streak, longest_streak, remaining_lives: lives } = streak;
+  let { current_streak, longest_streak, remaining_lives } = streak;
 
   if (diffDays >= 2) {
-    lives -= diffDays - 1;
+    remaining_lives -= diffDays - 1;
 
-    if (lives <= 0) {
+    const new_longest_streak = Math.max(longest_streak, current_streak);
+
+    if (remaining_lives <= 0) {
       // Reinicia racha
       current_streak = 0;
-      lives = 0;
+      remaining_lives = 0;
     }
 
     return {
       current_streak,
-      longest_streak,
-      remaining_lives: lives,
+      longest_streak: new_longest_streak,
+      remaining_lives,
       changed: true,
     };
   }
@@ -131,7 +133,6 @@ export const extendStreakService = async ({
 
     const updatedStreak = await updateUserStreak(userId, {
       current_streak: newCurrentStreak,
-      longest_streak: Math.max(userStreak.longest_streak, newCurrentStreak),
       last_completed_date: todayUserTZ.format("YYYY-MM-DD"),
       remaining_lives:
         userStreak.remaining_lives === 0 ? 3 : userStreak.remaining_lives,
