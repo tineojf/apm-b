@@ -12,17 +12,13 @@ export const fetchOpenAIResponse = async (prompt: string): Promise<string> => {
   const dynamicPrompt = `${prompt}\nToday: ${today}, Seed: ${randomSeed}`;
 
   try {
-    const data = await client.responses.create({
+    const data = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      input: dynamicPrompt,
-      max_output_tokens: 150,
+      messages: [{ role: "user", content: dynamicPrompt }],
+      max_tokens: 150,
     });
 
-    if (!data?.output_text) {
-      throw new Error("No output text from OpenAI");
-    }
-
-    return data.output_text;
+    return data.choices[0]?.message?.content || "No response";
   } catch (error: any) {
     throw new Error("OpenAI Error: " + (error.message || error.toString()));
   }
