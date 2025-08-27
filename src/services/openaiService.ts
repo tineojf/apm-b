@@ -1,8 +1,6 @@
 import { generatePrayer } from "../prompts/dailyPrayerPrompt";
-import { generateCitation } from "../prompts/citationPrompt";
 import { fetchOpenAIResponse } from "../utils/fetchOpenAI";
 import { supabase } from "../utils/supabaseClient";
-import { generateSpanishPrompt } from "../prompts/citationTranslationPrompt";
 
 export const getCitationService = async (): Promise<any> => {
   const fetchPhrase = async (id: number) => {
@@ -30,6 +28,34 @@ export const getCitationService = async (): Promise<any> => {
     if (error) throw new Error(`Update failed for id ${id}: ${error.message}`);
   };
 
+  const randomID = async (): Promise<number> => {
+    try {
+      const { count, error } = await supabase
+        .from("phrase_history_en")
+        .select("*", { count: "exact", head: true });
+
+      if (error) throw new Error(`DB Count: ${error.message}`);
+      if (!count || count === 0) throw new Error("No phrases in DB");
+
+      return Math.floor(Math.random() * count) + 1;
+    } catch (error) {
+      console.error("Error fetching random ID:", error);
+      return 1;
+    }
+  };
+
+  const fetchRandomPhrase = async (table: string, randomID: number) => {
+    const { data, error } = await supabase
+      .from(table)
+      .select("id, phrase")
+      .eq("id", String(randomID))
+      .maybeSingle();
+
+    if (error) throw new Error(`DB: ${error.message}`);
+
+    return data?.phrase ?? null;
+  };
+
   const enData = await fetchPhrase(1);
   const esData = await fetchPhrase(2);
 
@@ -38,27 +64,22 @@ export const getCitationService = async (): Promise<any> => {
 
   if (currentHour !== updatedHour) {
     try {
-      const newEN = await fetchOpenAIResponse(generateCitation);
-      const newES = await fetchOpenAIResponse(generateSpanishPrompt(newEN));
+      const randomIDValue = await randomID();
+      const newEN = await fetchRandomPhrase("phrase_history_en", randomIDValue);
+      const newES = await fetchRandomPhrase("phrase_history_es", randomIDValue);
 
       const newTime = `${currentHour.toString().padStart(2, "0")}:00:00`;
 
       await updatePhrase(1, newEN, newTime);
       await updatePhrase(2, newES, newTime);
 
-      const { error: insertError } = await supabase
-        .from("phrase_history")
-        .insert({ phrase: newEN, updated_at: newTime });
-      if (insertError) throw new Error("Insert failed: " + insertError.message);
-
-      return {
-        phrase: {
-          en: newEN,
-          es: newES,
-        },
-        updated_at: newTime,
-      };
-    } catch {}
+      enData.phrase = newEN;
+      esData.phrase = newES;
+      enData.updated_at = newTime;
+      console.log(`Phrases updated to ID ${randomIDValue}`);
+    } catch (error) {
+      console.error("Error updating phrases, keeping existing ones.", error);
+    }
   }
 
   return {
