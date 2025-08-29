@@ -2,6 +2,8 @@ import { generatePrayer } from "../prompts/dailyPrayerPrompt";
 import { fetchOpenAIResponse } from "../utils/fetchOpenAI";
 import { supabase } from "../utils/supabaseClient";
 
+type Answer = "Good" | "Bad" | "Bien" | "Mal" | "Neutral";
+
 export const getCitationService = async (): Promise<any> => {
   const fetchPhrase = async (id: number) => {
     const { data, error } = await supabase
@@ -92,11 +94,35 @@ export const getCitationService = async (): Promise<any> => {
 };
 
 export const createPrayerService = async (
-  answer: string,
+  answer: Answer,
   lang: string
 ): Promise<string> => {
-  const language = lang === "en" ? "english" : "spanish";
-  const prompt = generatePrayer(answer, language);
-  const result = await fetchOpenAIResponse(prompt);
-  return result;
+  const type = resolveType(answer, lang);
+
+  const { data, error } = await supabase
+    .from("prayer")
+    .select("prayer")
+    .eq("answer", type);
+
+  if (error) {
+    console.error("Supabase error:", error.message);
+    throw new Error("No se pudo obtener la oración");
+  }
+
+  const randomIndex = Math.floor(Math.random() * data.length);
+  const randomItem = data[randomIndex].prayer;
+
+  return randomItem;
 };
+
+function resolveType(answer: Answer, lang: string): string {
+  const map: Record<Answer, string> = {
+    Good: "Good",
+    Bad: "Bad",
+    Bien: "Bien",
+    Mal: "Mal",
+    Neutral: lang === "en" ? "NeutralEn" : "NeutralEs",
+  };
+
+  return map[answer] ?? "NeutralEn";
+}
